@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>TypeScript HTML App</title>
+    <link rel="stylesheet" href="css/app.css" type="text/css" />
+    <script src="scripts/VSS.SDK.js"></script>
+</head>
+<body>
+    <script type="text/javascript">
+    // Initialize the VSS sdk
+    VSS.init({
+        setupModuleLoader: true,
+        explicitNotifyLoaded: true,
+        usePlatformScripts: true,
+        moduleLoaderConfig: {
+            paths: {
+                "Scripts": "scripts"
+            }
+        }
+    });
+
+    //// Wait for the SDK to be initialized
+    VSS.ready(function () {
+        console.log("Hello!");
+        require(["Scripts/testResultsTab"], function () { });
+        });
+
+    </script>
+
+    <h1>TypeScript HTML App</h1>
+
+    <div id="content"></div>
+
+    <div class="events"></div>
+</body>
+</html>

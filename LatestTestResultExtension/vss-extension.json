@@ -1,0 +1,58 @@
+{
+  "manifestVersion": 1,
+  "id": "getlatesttestresult",
+  "version": "0.1.0",
+  "name": "View Latest Test Result",
+  "scopes": [ "vso.work", "vso.work_write", "vso.test" ],
+  "description": "Allows you to easily view the latest test results for a test case from the work item form.",
+  "baseUri": "https://localhost:44300",
+  "publisher": "keesverhaar",
+  "public": false,
+  "icons": {
+    "default": "img/logo.png"
+  },
+  "tags": [
+    "Test"
+  ],
+  "links": {
+        "home": {
+            "uri": "https://bit.ly"
+        },
+        "getstarted": {
+            "uri": "https://bit.ly"
+        },
+        "learn": {
+            "uri": "https://bit.ly"
+        },
+        "support": {
+            "uri": "https://bit.ly"
+        },
+        "repository": {
+            "uri": "https://bit.ly"
+        },
+        "issues": {
+            "uri": "https://bit.ly"
+        }
+    },
+    "branding": {
+        "color": "rgb(220, 235, 252)",
+    "theme": "light"
+    },
+  "categories": [
+    "Sync and integration"
+  ],
+  "contributions": [
+    {
+      "id": "test-results-page",
+      "targets": [
+        "ms.vss-work-web.work-item-form"
+      ],
+      "type": "ms.vss-work-web.work-item-form-page",
+      "properties": {
+        "name": "Test Results",
+        "order": 100,
+        "uri": "index.html"
+      }
+    }
+  ]
+}
