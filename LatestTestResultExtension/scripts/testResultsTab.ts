@@ -4,7 +4,11 @@
 import WorkItemServices = require("TFS/WorkItemTracking/Services");
 import TestManagementRestClient = require("TFS/TestManagement/RestClient");
 
+import Controls = require("VSS/Controls");
+import Grids = require("VSS/Controls/Grids");
+
 interface testResultsRow {
+    plan: string;
     suite: string;
     configuration: string;
     outcome: string;
@@ -19,15 +23,35 @@ function getWorkItemFormService() {
 }
 
 function addTestResultRow(resultRow: testResultsRow) {
-    console.log("Added - Test suite: " + resultRow.suite + ", configuration: " + resultRow.configuration + ", result: " + resultRow.outcome);
+    console.log("Added - Plan: "+ resultRow.plan + ", suite: " + resultRow.suite + ", configuration: " + resultRow.configuration + ", result: " + resultRow.outcome);
     testResults.push(resultRow);
+    testResults.sort();
 }
 
 function printTestResults() {
     console.log("Test results are:");
     $.each(testResults, (index, testResult) => {
-        console.log("Printing - Test suite: " + testResult.suite + ", configuration: " + testResult.configuration + ", result: " + testResult.outcome);
+        console.log("Printing - Plan: "+ testResult.plan +", suite: " + testResult.suite + ", configuration: " + testResult.configuration + ", result: " + testResult.outcome);
     });
+
+    var container = $("#test-result-container");
+
+    var gridOptions: Grids.IGridOptions = {
+        height: "500px",
+        width: "100%",
+        source: testResults,
+        columns: [
+            { text: "Plan", index: "plan", width: 200 },
+            { text: "Suite", index: "suite", width: 200 },
+            { text: "Configuration", index: "configuration", width: 200 },
+            { text: "Outcome", index: "outcome", width: 200 }
+        ]
+    };
+
+    Controls.create(Grids.Grid, container, gridOptions);
+
+    console.log("Finished!");
+
 }
 
 var testResultsPage = function () {
@@ -68,7 +92,7 @@ var testResultsPage = function () {
 
                                             if (points.length > 0) {
                                                 $.each(points, (index, point) => {
-                                                    addTestResultRow({ suite: point.suite.name, configuration: point.configuration.name, outcome: point.outcome });
+                                                    addTestResultRow({ plan: point.testPlan.name, suite: point.suite.name, configuration: point.configuration.name, outcome: point.outcome });
                                                 });
                                                 if (suitesReceived >= suites.length) {
                                                     //if we have all the data for all the suites, print it
@@ -92,6 +116,7 @@ var testResultsPage = function () {
         }
     }
 }
+
 
 VSS.register("test-results-page", testResultsPage);
 

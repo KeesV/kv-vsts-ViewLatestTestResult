@@ -1,7 +1,61 @@
 ﻿body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, Verdana;
+    padding: 20px;
 }
 
 span {
     font-style: italic;
+}
+
+h1 {
+    box-sizing: border-box;
+    color: rgb(66, 66, 66);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+div.grid-group {
+    box-sizing: border-box;
+    color: rgb(0, 0, 0);
+    display: block;
+    font-size: 12px;
+    padding-bottom: 0px;
+    padding-left: 18px;
+    padding-right: 5px;
+    /*padding-top: 5px;*/
+}
+
+div.form-header {
+    border-bottom-color: rgb(230, 230, 230);
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-image-outset: 0px;
+    border-image-repeat: stretch;
+    border-image-slice: 100%;
+    border-image-source: none;
+    border-image-width: 1;
+    border-left-color: rgba(0, 0, 0, 0);
+    border-left-style: solid;
+    border-left-width: 1px;
+    border-right-color: rgba(0, 0, 0, 0);
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-top-color: rgba(0, 0, 0, 0);
+    border-top-style: solid;
+    border-top-width: 1px;
+    box-sizing: border-box;
+    color: rgb(66, 66, 66);
+    cursor: auto;
+    display: block;
+    /*margin-bottom: 5px;*/
+    min-height: 24px;
+    outline-color: rgb(66, 66, 66);
+    outline-style: none;
+    outline-width: 0px;
+    padding-bottom: 4.8px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 4.8px;
+    position: relative;
+    width: 813px;
 }

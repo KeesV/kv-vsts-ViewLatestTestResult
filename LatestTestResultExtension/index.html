@@ -9,26 +9,34 @@
 </head>
 <body>
     <script type="text/javascript">
-    // Initialize the VSS sdk
-    VSS.init({
-        setupModuleLoader: true,
-        explicitNotifyLoaded: true,
-        usePlatformScripts: true,
-        moduleLoaderConfig: {
-            paths: {
-                "Scripts": "scripts"
+        // Initialize the VSS sdk
+        VSS.init({
+            setupModuleLoader: true,
+            explicitNotifyLoaded: true,
+            usePlatformScripts: true,
+            usePlatformStyles: true,
+            moduleLoaderConfig: {
+                paths: {
+                    "Scripts": "scripts"
+                }
             }
-        }
-    });
+        });
 
-    //// Wait for the SDK to be initialized
-    VSS.ready(function () {
-        console.log("Hello!");
-        require(["Scripts/testResultsTab"], function () { });
+        //// Wait for the SDK to be initialized
+        VSS.ready(function () {
+            require(["Scripts/testResultsTab"], function () { });
         });
 
     </script>
 
-    <div id="content"></div>
+    <div class="grid-group">
+        <div class="form-header">
+            <h1>Latest test results</h1>
+        </div>
+
+        <p>These are the latest test results for this test case for each plan, suite &amp; configuration in which it is included.</p>
+
+        <div id="test-result-container"></div>
+    </div>
 </body>
 </html>
