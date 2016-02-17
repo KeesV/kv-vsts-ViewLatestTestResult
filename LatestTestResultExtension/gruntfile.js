@@ -27,7 +27,7 @@ module.exports = function (grunt) {
             main: {
                 files: [
                   // includes files within path
-                  { expand: true, flatten: true, src: ['node_modules/vss-sdk/lib/VSS.SDK.js'], dest: 'scripts/', filter: 'isFile' },
+                  { expand: true, flatten: true, src: ['node_modules/vss-web-extension-sdk/lib/VSS.SDK.js'], dest: 'scripts/', filter: 'isFile' },
                   //{ expand: true, flatten: true, src: ['node_modules/vss-sdk/typings/VSS.d.ts'], dest: 'scripts/ref', filter: 'isFile' },
                    // { expand: true, flatten: true, src: ['node_modules/vss-sdk/typings/TFS.d.ts'], dest: 'scripts/ref', filter: 'isFile' }
                 ]

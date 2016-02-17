@@ -63,6 +63,7 @@
     <TypeScriptCompile Include="scripts\app.ts" />
     <TypeScriptCompile Include="scripts\ref\jquery.d.ts" />
     <TypeScriptCompile Include="scripts\ref\q.d.ts" />
+    <TypeScriptCompile Include="scripts\ref\rmo.d.ts" />
     <TypeScriptCompile Include="scripts\testResultsTab.ts" />
     <TypeScriptCompile Include="scripts\ref\VSS.d.ts" />
     <TypeScriptCompile Include="scripts\ref\TFS.d.ts" />

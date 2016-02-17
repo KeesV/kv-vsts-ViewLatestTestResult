@@ -6,6 +6,7 @@ import TestManagementRestClient = require("TFS/TestManagement/RestClient");
 
 import Controls = require("VSS/Controls");
 import Grids = require("VSS/Controls/Grids");
+import Menus = require("VSS/Controls/Menus");
 
 interface testResultsRow {
     plan: string;
@@ -20,6 +21,37 @@ var testResults = [];
 // that currently is displayed in the UI).
 function getWorkItemFormService() {
     return WorkItemServices.WorkItemFormService.getService();
+}
+
+function getContextMenuItems(): Menus.IMenuItemSpec[] {
+    return [
+        {
+            id: "viewTestPlan",
+            text: "View Test Plan",
+        },
+        {
+            id: "viewTestSuite",
+            text: "View Test Suite",
+        },
+        { separator: true },
+        {
+            id: "viewToTestRun",
+            text: "View Test Run"
+        }
+    ];
+}
+
+function menuItemClick(args) {
+    // Get the item associated with the context menu
+    var person = args.get_commandArgument().item;
+    switch (args.get_commandName()) {
+        case "open":
+            alert(JSON.stringify(person));
+            break;
+        case "delete":
+            confirm("Are you sure you want to delete " + person[0] + "?");
+            break;
+    }
 }
 
 function addTestResultRow(resultRow: testResultsRow) {
@@ -45,7 +77,18 @@ function printTestResults() {
             { text: "Suite", index: "suite", width: 200 },
             { text: "Configuration", index: "configuration", width: 200 },
             { text: "Outcome", index: "outcome", width: 200 }
-        ]
+        ],
+        gutter: {
+            contextMenu: true
+        },
+        contextMenu: {
+            items: getContextMenuItems(),
+            executeAction: menuItemClick,
+            
+            //arguments: (contextInfo) => {
+            //    return { item: contextInfo.item };
+            //}
+        }
     };
 
     Controls.create(Grids.Grid, container, gridOptions);
