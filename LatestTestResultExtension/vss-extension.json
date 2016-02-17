@@ -6,7 +6,12 @@
   "scopes": [ "vso.work", "vso.work_write", "vso.test" ],
   "description": "Allows you to easily view the latest test results for a test case from the work item form.",
   "baseUri": "https://localhost:44300",
-  "publisher": "keesverhaar",
+  "publisher": "keesv",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
   "public": false,
   "icons": {
     "default": "img/logo.png"
@@ -15,31 +20,31 @@
     "Test"
   ],
   "links": {
-        "home": {
-            "uri": "https://bit.ly"
-        },
-        "getstarted": {
-            "uri": "https://bit.ly"
-        },
-        "learn": {
-            "uri": "https://bit.ly"
-        },
-        "support": {
-            "uri": "https://bit.ly"
-        },
-        "repository": {
-            "uri": "https://bit.ly"
-        },
-        "issues": {
-            "uri": "https://bit.ly"
-        }
+    "home": {
+      "uri": "https://bit.ly"
     },
-    "branding": {
-        "color": "rgb(220, 235, 252)",
+    "getstarted": {
+      "uri": "https://bit.ly"
+    },
+    "learn": {
+      "uri": "https://bit.ly"
+    },
+    "support": {
+      "uri": "https://bit.ly"
+    },
+    "repository": {
+      "uri": "https://bit.ly"
+    },
+    "issues": {
+      "uri": "https://bit.ly"
+    }
+  },
+  "branding": {
+    "color": "rgb(220, 235, 252)",
     "theme": "light"
-    },
+  },
   "categories": [
-    "Sync and integration"
+    "Test"
   ],
   "contributions": [
     {
