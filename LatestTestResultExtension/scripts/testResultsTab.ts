@@ -28,7 +28,6 @@ function getWorkItemFormService() {
     return WorkItemServices.WorkItemFormService.getService();
 }
 
-
 function getContextMenuItems(): Menus.IMenuItemSpec[] {
     return [
         {
@@ -105,68 +104,56 @@ var testResultsPage = function () {
     return {
         // Called when a new work item is being loaded in the UI
         onLoaded: function (args) {
+            var testCaseId = +args.id;
 
-            getWorkItemFormService().then(function (service) {            
-                // Get the current values for a few of the common fields
-                service.getFieldValues(["System.Id", "System.Title", "System.State", "System.CreatedDate"]).then(
-                    function (value) {
+            var suites = TestManagementRestClient.getClient().getSuitesByTestCaseId(testCaseId).then(
+                function (suites) {
+                    var suitesReceived = 0;
 
-                        var testCaseId = +value["System.Id"];
+                    $.each(suites, (index, suite) => {
 
-                        var suites = TestManagementRestClient.getClient().getSuitesByTestCaseId(testCaseId).then(
-                            function (suites) {
-                                var suitesReceived = 0;
+                        var pointsForSuite = TestManagementRestClient.getClient().getPoints(
+                            suite.project.id,
+                            +suite.plan.id,
+                            suite.id,
+                            undefined,
+                            undefined,
+                            testCaseId.toString(),
+                            undefined,
+                            true,
+                            undefined,
+                            undefined
+                        ).then(
+                            function (points) {
+                                suitesReceived++;
 
-                                $.each(suites, (index, suite) => {
-
-                                    var pointsForSuite = TestManagementRestClient.getClient().getPoints(
-                                        suite.project.id,
-                                        +suite.plan.id,
-                                        suite.id,
-                                        undefined,
-                                        undefined,
-                                        testCaseId.toString(),
-                                        undefined,
-                                        true,
-                                        undefined,
-                                        undefined
-                                    ).then(
-                                        function (points) {
-                                            suitesReceived++;
-
-                                            if (points.length > 0) {
-                                                $.each(points, (index, point) => {
-                                                    addTestResultRow({
-                                                        projectId: suite.project.id,
-                                                        plan: point.testPlan.name,
-                                                        planId: point.testPlan.id,
-                                                        suite: point.suite.name,
-                                                        suiteId: point.suite.id,
-                                                        runId: point.lastTestRun.id,
-                                                        configuration: point.configuration.name,
-                                                        outcome: point.outcome
-                                                    });
-                                                });
-                                                if (suitesReceived >= suites.length) {
-                                                    //if we have all the data for all the suites, print it
-                                                    printTestResults();
-                                                    $("#loading").hide();
-                                                }
-                                            } else {
-                                                console.log("No test points for this test case in this suite.");
-                                            }
-                                        }
-                                    );
-                                });              
-
+                                if (points.length > 0) {
+                                    $.each(points, (index, point) => {
+                                        addTestResultRow({
+                                            projectId: suite.project.id,
+                                            plan: point.testPlan.name,
+                                            planId: point.testPlan.id,
+                                            suite: point.suite.name,
+                                            suiteId: point.suite.id,
+                                            runId: point.lastTestRun.id,
+                                            configuration: point.configuration.name,
+                                            outcome: point.outcome
+                                        });
+                                    });
+                                    if (suitesReceived >= suites.length) {
+                                        //if we have all the data for all the suites, print it
+                                        printTestResults();
+                                        $("#loading").hide();
+                                    }
+                                } else {
+                                    console.log("No test points for this test case in this suite.");
+                                }
                             }
                         );
+                    });              
 
-                    },
-                    function (error) {
-                        window.alert(error.message);
-                    });
-            });
+                }
+            );               
         }
     }
 }
