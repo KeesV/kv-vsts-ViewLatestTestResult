@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".vscode\tasks.json" />
+    <Content Include="img\throbber.gif" />
     <Content Include="web.config" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>

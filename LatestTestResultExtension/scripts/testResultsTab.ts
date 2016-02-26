@@ -9,6 +9,7 @@ import Grids = require("VSS/Controls/Grids");
 import Menus = require("VSS/Controls/Menus");
 
 interface testResultsRow {
+    projectId: string,
     plan: string;
     planId: string,
     suite: string;
@@ -26,6 +27,7 @@ var grid: Grids.Grid;
 function getWorkItemFormService() {
     return WorkItemServices.WorkItemFormService.getService();
 }
+
 
 function getContextMenuItems(): Menus.IMenuItemSpec[] {
     return [
@@ -46,39 +48,35 @@ function getContextMenuItems(): Menus.IMenuItemSpec[] {
 }
 
 function menuItemClick(args) {
-    console.log("Clicked!");
-    
     // Get the item associated with the context menu
     var clickedRow: testResultsRow = testResults[grid.getContextMenuRowInfo().dataIndex];
-
+    var webContext = VSS.getWebContext();
 
     switch (args._commandName) {
         case 'viewTestPlan':
-            console.log("View test plan");
+            var url = webContext.collection.uri + webContext.project.name + "/_testManagement?planId=" + clickedRow.planId;
+            parent.window.location.href = url;
             break;
 
         case 'viewTestSuite':
-            console.log("View test suite");
+            var url = webContext.collection.uri + webContext.project.name + "/_testManagement?planId=" + clickedRow.planId + "&suiteId=" + clickedRow.suiteId;
+            parent.window.location.href = url;
             break;
 
         case 'viewTestRun':
-            console.log("View test run");
+            TestManagementRestClient.getClient().getTestRunById(clickedRow.projectId, +clickedRow.runId).then(function (run) {
+                parent.window.location.href = run.webAccessUrl;
+            });
             break;
     }
 }
 
 function addTestResultRow(resultRow: testResultsRow) {
-    console.log("Added - Plan: "+ resultRow.plan + ", suite: " + resultRow.suite + ", configuration: " + resultRow.configuration + ", result: " + resultRow.outcome);
     testResults.push(resultRow);
     testResults.sort();
 }
 
 function printTestResults() {
-    console.log("Test results are:");
-    $.each(testResults, (index, testResult) => {
-        console.log("Printing - Plan: "+ testResult.plan +", suite: " + testResult.suite + ", configuration: " + testResult.configuration + ", result: " + testResult.outcome);
-    });
-
     var container = $("#test-result-container");
 
     var gridOptions: Grids.IGridOptions = {
@@ -97,17 +95,10 @@ function printTestResults() {
         contextMenu: {
             items: getContextMenuItems(),
             executeAction: menuItemClick,
-            
-            //arguments: (contextInfo) => {
-            //    return { item: contextInfo.item };
-            //}
         }
     };
 
     grid = Controls.create(Grids.Grid, container, gridOptions);
-
-    console.log("Finished!");
-
 }
 
 var testResultsPage = function () {
@@ -121,15 +112,12 @@ var testResultsPage = function () {
                     function (value) {
 
                         var testCaseId = +value["System.Id"];
-                        console.log("Work item id: " + testCaseId);
 
                         var suites = TestManagementRestClient.getClient().getSuitesByTestCaseId(testCaseId).then(
                             function (suites) {
                                 var suitesReceived = 0;
 
                                 $.each(suites, (index, suite) => {
-                                    console.log("Suite: " + suite.name);
-                                    console.log("Getting points for suite " + suite.id);
 
                                     var pointsForSuite = TestManagementRestClient.getClient().getPoints(
                                         suite.project.id,
@@ -149,6 +137,7 @@ var testResultsPage = function () {
                                             if (points.length > 0) {
                                                 $.each(points, (index, point) => {
                                                     addTestResultRow({
+                                                        projectId: suite.project.id,
                                                         plan: point.testPlan.name,
                                                         planId: point.testPlan.id,
                                                         suite: point.suite.name,
@@ -161,6 +150,7 @@ var testResultsPage = function () {
                                                 if (suitesReceived >= suites.length) {
                                                     //if we have all the data for all the suites, print it
                                                     printTestResults();
+                                                    $("#loading").hide();
                                                 }
                                             } else {
                                                 console.log("No test points for this test case in this suite.");
