@@ -10,12 +10,16 @@ import Menus = require("VSS/Controls/Menus");
 
 interface testResultsRow {
     plan: string;
+    planId: string,
     suite: string;
+    suiteId: string,
+    runId: string,
     configuration: string;
     outcome: string;
 }
 
-var testResults = [];
+var testResults: testResultsRow[] = [];
+var grid: Grids.Grid;
 
 // Get the WorkItemFormService.  This service allows you to get/set fields/links on the 'active' work item (the work item
 // that currently is displayed in the UI).
@@ -35,21 +39,30 @@ function getContextMenuItems(): Menus.IMenuItemSpec[] {
         },
         { separator: true },
         {
-            id: "viewToTestRun",
+            id: "viewTestRun",
             text: "View Test Run"
         }
     ];
 }
 
 function menuItemClick(args) {
+    console.log("Clicked!");
+    
     // Get the item associated with the context menu
-    var person = args.get_commandArgument().item;
-    switch (args.get_commandName()) {
-        case "open":
-            alert(JSON.stringify(person));
+    var clickedRow: testResultsRow = testResults[grid.getContextMenuRowInfo().dataIndex];
+
+
+    switch (args._commandName) {
+        case 'viewTestPlan':
+            console.log("View test plan");
             break;
-        case "delete":
-            confirm("Are you sure you want to delete " + person[0] + "?");
+
+        case 'viewTestSuite':
+            console.log("View test suite");
+            break;
+
+        case 'viewTestRun':
+            console.log("View test run");
             break;
     }
 }
@@ -91,7 +104,7 @@ function printTestResults() {
         }
     };
 
-    Controls.create(Grids.Grid, container, gridOptions);
+    grid = Controls.create(Grids.Grid, container, gridOptions);
 
     console.log("Finished!");
 
@@ -135,7 +148,15 @@ var testResultsPage = function () {
 
                                             if (points.length > 0) {
                                                 $.each(points, (index, point) => {
-                                                    addTestResultRow({ plan: point.testPlan.name, suite: point.suite.name, configuration: point.configuration.name, outcome: point.outcome });
+                                                    addTestResultRow({
+                                                        plan: point.testPlan.name,
+                                                        planId: point.testPlan.id,
+                                                        suite: point.suite.name,
+                                                        suiteId: point.suite.id,
+                                                        runId: point.lastTestRun.id,
+                                                        configuration: point.configuration.name,
+                                                        outcome: point.outcome
+                                                    });
                                                 });
                                                 if (suitesReceived >= suites.length) {
                                                     //if we have all the data for all the suites, print it
