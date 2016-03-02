@@ -44,6 +44,7 @@
     <None Include=".vscode\tasks.json" />
     <Content Include="img\throbber.gif" />
     <Content Include="web.config" />
+    <Content Include="vss-extension-release.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -71,7 +72,7 @@
     <TypeScriptCompile Include="scripts\ref\knockout.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="vss-extension.json" />
+    <None Include="vss-extension-debug.json" />
     <None Include="settings.vset.json" />
     <None Include="gruntfile.js" />
   </ItemGroup>

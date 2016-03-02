@@ -100,60 +100,79 @@ function printTestResults() {
     grid = Controls.create(Grids.Grid, container, gridOptions);
 }
 
+function UpdateForm(testCaseId) {
+    var suites = TestManagementRestClient.getClient().getSuitesByTestCaseId(testCaseId).then(
+        function (suites) {
+            var suitesReceived = 0;
+
+            $.each(suites, (index, suite) => {
+
+                var pointsForSuite = TestManagementRestClient.getClient().getPoints(
+                    suite.project.id,
+                    +suite.plan.id,
+                    suite.id,
+                    undefined,
+                    undefined,
+                    testCaseId.toString(),
+                    undefined,
+                    true,
+                    undefined,
+                    undefined
+                ).then(
+                    function (points) {
+                        suitesReceived++;
+
+                        if (points.length > 0) {
+                            $.each(points, (index, point) => {
+                                addTestResultRow({
+                                    projectId: suite.project.id,
+                                    plan: point.testPlan.name,
+                                    planId: point.testPlan.id,
+                                    suite: point.suite.name,
+                                    suiteId: point.suite.id,
+                                    runId: point.lastTestRun.id,
+                                    configuration: point.configuration.name,
+                                    outcome: point.outcome
+                                });
+                            });
+                            if (suitesReceived >= suites.length) {
+                                //if we have all the data for all the suites, print it
+                                printTestResults();
+                                $("#loading").hide();
+                            }
+                        } else {
+                            console.log("No test points for this test case in this suite.");
+                        }
+                    }
+                    );
+            });
+
+        }
+    );
+}
+
 var testResultsPage = function () {
     return {
         // Called when a new work item is being loaded in the UI
         onLoaded: function (args) {
             var testCaseId = +args.id;
-
-            var suites = TestManagementRestClient.getClient().getSuitesByTestCaseId(testCaseId).then(
-                function (suites) {
-                    var suitesReceived = 0;
-
-                    $.each(suites, (index, suite) => {
-
-                        var pointsForSuite = TestManagementRestClient.getClient().getPoints(
-                            suite.project.id,
-                            +suite.plan.id,
-                            suite.id,
-                            undefined,
-                            undefined,
-                            testCaseId.toString(),
-                            undefined,
-                            true,
-                            undefined,
-                            undefined
-                        ).then(
-                            function (points) {
-                                suitesReceived++;
-
-                                if (points.length > 0) {
-                                    $.each(points, (index, point) => {
-                                        addTestResultRow({
-                                            projectId: suite.project.id,
-                                            plan: point.testPlan.name,
-                                            planId: point.testPlan.id,
-                                            suite: point.suite.name,
-                                            suiteId: point.suite.id,
-                                            runId: point.lastTestRun.id,
-                                            configuration: point.configuration.name,
-                                            outcome: point.outcome
-                                        });
-                                    });
-                                    if (suitesReceived >= suites.length) {
-                                        //if we have all the data for all the suites, print it
-                                        printTestResults();
-                                        $("#loading").hide();
-                                    }
-                                } else {
-                                    console.log("No test points for this test case in this suite.");
-                                }
-                            }
-                        );
-                    });              
-
-                }
-            );               
+            if (args.isNew) {
+                $("#test-result-container").append("<p style='font-style: italic'>Test case is not saved yet. Please save the test case to display the test results.</p>");
+                $("#loading").hide();
+            } else {
+                UpdateForm(testCaseId);
+            }              
+        },
+        onRefreshed: function (args) {
+            var testCaseId = +args.id;
+            grid.dispose();
+            testResults = [];
+            $("#loading").show();
+            UpdateForm(testCaseId);
+        },
+        onSaved: function (args) {
+            var testCaseId = +args.id;
+            UpdateForm(testCaseId);
         }
     }
 }

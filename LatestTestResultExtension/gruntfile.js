@@ -7,8 +7,13 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
         exec: {
-            package: {
-                command: "vset package -s settings.vset.json",
+            package_release: {
+                command: "vset package -m vss-extension-release.json -s settings.vset.json",
+                stdout: true,
+                stderr: true
+            },
+            package_debug: {
+                command: "vset package -m vss-extension-debug.json -s settings.vset.json",
                 stdout: true,
                 stderr: true
             },
