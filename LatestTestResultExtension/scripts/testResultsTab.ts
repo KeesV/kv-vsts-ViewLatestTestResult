@@ -100,7 +100,7 @@ function printTestResults() {
     grid = Controls.create(Grids.Grid, container, gridOptions);
 }
 
-function UpdateForm(testCaseId) {
+function UpdateForm(testCaseId: number) {
     var suites = TestManagementRestClient.getClient().getSuitesByTestCaseId(testCaseId).then(
         function (suites) {
             var suitesReceived = 0;
@@ -151,28 +151,48 @@ function UpdateForm(testCaseId) {
     );
 }
 
+function isTestCase(workItemId: number): boolean {
+    return false;
+}
+
 var testResultsPage = function () {
     return {
         // Called when a new work item is being loaded in the UI
         onLoaded: function (args) {
             var testCaseId = +args.id;
             if (args.isNew) {
-                $("#test-result-container").append("<p style='font-style: italic'>Test case is not saved yet. Please save the test case to display the test results.</p>");
+                $("#test-result-error").html("Work item is not saved yet. Please save the work item to display the test results.");
+                $("#loading").hide();
+            } else if (!isTestCase(testCaseId)) {
+                $("#test-result-error").html("This is not a test case, so we can't display recent test results.");
                 $("#loading").hide();
             } else {
                 UpdateForm(testCaseId);
-            }              
+            }
+                          
         },
         onRefreshed: function (args) {
             var testCaseId = +args.id;
-            grid.dispose();
-            testResults = [];
-            $("#loading").show();
-            UpdateForm(testCaseId);
+
+            if (isTestCase(testCaseId)) {
+
+                grid.dispose();
+                testResults = [];
+                $("#loading").show();
+                UpdateForm(testCaseId);
+            } else {
+                $("#test-result-error").html("This is not a test case, so we can't display recent test results.");
+                $("#loading").hide();
+            }
         },
         onSaved: function (args) {
             var testCaseId = +args.id;
-            UpdateForm(testCaseId);
+            if (isTestCase(testCaseId)) {
+                UpdateForm(testCaseId);
+            } else {
+                $("#test-result-error").html("This is not a test case, so we can't display recent test results.");
+                $("#loading").hide();
+            }
         }
     }
 }
