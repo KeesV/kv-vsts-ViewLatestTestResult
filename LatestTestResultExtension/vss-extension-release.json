@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
-  "id": "getlatesttestresult",
-  "version": "1.0.0",
+  "id": "viewlatesttestresult",
+  "version": "1.0.1",
   "name": "View Latest Test Result",
   "scopes": [ "vso.work", "vso.test" ],
   "description": "Allows you to easily view the latest test results for a test case from the work item form.",
@@ -33,6 +33,19 @@
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
+  "content": {
+    "details": {
+      "path": "doc/Overview.md"
+    }
+  },
+  "screenshots": [
+    {
+      "path": "doc/TestCaseForm.jpg"
+    },
+    {
+      "path": "doc/ContextMenu.jpg"
+    }
+  ],
   "public": false,
   "icons": {
     "default": "img/icon.png"
@@ -42,22 +55,22 @@
   ],
   "links": {
     "home": {
-      "uri": "https://bit.ly"
+      "uri": "https://github.com/KeesV/kv-vsts-ViewLatestTestResult"
     },
     "getstarted": {
-      "uri": "https://bit.ly"
+      "uri": "https://github.com/KeesV/kv-vsts-ViewLatestTestResult"
     },
     "learn": {
-      "uri": "https://bit.ly"
+      "uri": "https://github.com/KeesV/kv-vsts-ViewLatestTestResult"
     },
     "support": {
-      "uri": "https://bit.ly"
+      "uri": "https://github.com/KeesV/kv-vsts-ViewLatestTestResult/issues"
     },
     "repository": {
-      "uri": "https://bit.ly"
+      "uri": "https://github.com/KeesV/kv-vsts-ViewLatestTestResult"
     },
     "issues": {
-      "uri": "https://bit.ly"
+      "uri": "https://github.com/KeesV/kv-vsts-ViewLatestTestResult/issues"
     }
   },
   "branding": {
