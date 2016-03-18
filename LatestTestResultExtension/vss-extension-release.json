@@ -1,0 +1,84 @@
+{
+  "manifestVersion": 1,
+  "id": "getlatesttestresult",
+  "version": "1.0.0",
+  "name": "View Latest Test Result",
+  "scopes": [ "vso.work", "vso.test" ],
+  "description": "Allows you to easily view the latest test results for a test case from the work item form.",
+  "publisher": "keesverhaar",
+  "files": [
+    {
+      "path": "css",
+      "addressable": true
+    },
+    {
+      "path": "img",
+      "addressable": true
+    },
+    {
+      "path": "scripts/testResultsTab.js",
+      "addressable": true
+    },
+    {
+      "path": "scripts/VSS.SDK.js",
+      "addressable": true
+    },
+    {
+      "path": "index.html",
+      "addressable": true
+    }
+  ],
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "public": false,
+  "icons": {
+    "default": "img/logo.png"
+  },
+  "tags": [
+    "Test"
+  ],
+  "links": {
+    "home": {
+      "uri": "https://bit.ly"
+    },
+    "getstarted": {
+      "uri": "https://bit.ly"
+    },
+    "learn": {
+      "uri": "https://bit.ly"
+    },
+    "support": {
+      "uri": "https://bit.ly"
+    },
+    "repository": {
+      "uri": "https://bit.ly"
+    },
+    "issues": {
+      "uri": "https://bit.ly"
+    }
+  },
+  "branding": {
+    "color": "rgb(220, 235, 252)",
+    "theme": "light"
+  },
+  "categories": [
+    "Test"
+  ],
+  "contributions": [
+    {
+      "id": "test-results-page",
+      "targets": [
+        "ms.vss-work-web.work-item-form"
+      ],
+      "type": "ms.vss-work-web.work-item-form-page",
+      "properties": {
+        "name": "Test Results",
+        "order": 100,
+        "uri": "index.html"
+      }
+    }
+  ]
+}

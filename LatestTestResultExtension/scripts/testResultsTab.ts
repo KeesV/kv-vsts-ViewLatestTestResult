@@ -151,7 +151,7 @@ function UpdateForm(testCaseId: number) {
     );
 }
 
-function isTestCase(workItemId: number): boolean {
+function isTestCase(workItemId: number): void {
 
     getWorkItemFormService().then(function (service) {
         var wit = service.getFieldValue("System.WorkItemType", false) as IPromise<string>;
@@ -163,7 +163,6 @@ function isTestCase(workItemId: number): boolean {
             }
         });
     })
-    return false;
 }
 
 var testResultsPage = function () {
@@ -171,39 +170,56 @@ var testResultsPage = function () {
         // Called when a new work item is being loaded in the UI
         onLoaded: function (args) {
             var testCaseId = +args.id;
-            if (args.isNew) {
-                $("#test-result-error").html("Work item is not saved yet. Please save the work item to display the test results.");
-                $("#loading").hide();
-            } else if (!isTestCase(testCaseId)) {
-                $("#test-result-error").html("This is not a test case, so we can't display recent test results.");
-                $("#loading").hide();
-            } else {
-                UpdateForm(testCaseId);
-            }
-                          
+
+            getWorkItemFormService().then(function (service) {
+                var wit = service.getFieldValue("System.WorkItemType", false) as IPromise<string>;
+                wit.then(function (wit) {
+                    if (wit == "Test Case") {
+                        if (args.isNew) {
+                            $("#test-result-error").html("Work item is not saved yet. Please save the work item to display the test results.");
+                            $("#loading").hide();
+                        } else {
+                            UpdateForm(testCaseId);
+                        }
+                    } else {
+                        $("#test-result-error").html("This is not a test case, so we can't display recent test results.");
+                        $("#loading").hide();
+                    }
+                });
+            });                         
         },
         onRefreshed: function (args) {
             var testCaseId = +args.id;
 
-            if (isTestCase(testCaseId)) {
-
-                grid.dispose();
-                testResults = [];
-                $("#loading").show();
-                UpdateForm(testCaseId);
-            } else {
-                $("#test-result-error").html("This is not a test case, so we can't display recent test results.");
-                $("#loading").hide();
-            }
+            getWorkItemFormService().then(function (service) {
+                var wit = service.getFieldValue("System.WorkItemType", false) as IPromise<string>;
+                wit.then(function (wit) {
+                    if (wit == "Test Case") {
+                        grid.dispose();
+                        testResults = [];
+                        $("#loading").show();
+                        UpdateForm(testCaseId);
+                    } else {
+                        $("#test-result-error").html("This is not a test case, so we can't display recent test results.");
+                        $("#loading").hide();
+                    }
+                });
+            });
         },
         onSaved: function (args) {
             var testCaseId = +args.id;
-            if (isTestCase(testCaseId)) {
-                UpdateForm(testCaseId);
-            } else {
-                $("#test-result-error").html("This is not a test case, so we can't display recent test results.");
-                $("#loading").hide();
-            }
+
+            getWorkItemFormService().then(function (service) {
+                var wit = service.getFieldValue("System.WorkItemType", false) as IPromise<string>;
+                wit.then(function (wit) {
+                    if (wit == "Test Case") {
+                        UpdateForm(testCaseId);
+                    } else {
+                        $("#test-result-error").html("This is not a test case, so we can't display recent test results.");
+                        $("#loading").hide();
+                    }
+                });
+            });
         }
     }
 }
