@@ -14,7 +14,7 @@
   ],
   "public": false,
   "icons": {
-    "default": "img/logo.png"
+    "default": "img/icon.png"
   },
   "tags": [
     "Test"
