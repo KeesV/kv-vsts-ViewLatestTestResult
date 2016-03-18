@@ -152,6 +152,17 @@ function UpdateForm(testCaseId: number) {
 }
 
 function isTestCase(workItemId: number): boolean {
+
+    getWorkItemFormService().then(function (service) {
+        var wit = service.getFieldValue("System.WorkItemType", false) as IPromise<string>;
+        wit.then(function (wit) {
+            if (wit == "Test Case") {
+                return true;
+            } else {
+                return false;
+            }
+        });
+    })
     return false;
 }
 

@@ -6,7 +6,7 @@
     "grunt-exec": "~0.4.6",
     "jasmine": "~2.3.2",
     "vset": "^0.4.24",
-    "vss-web-extension-sdk": "^1.95.1"
+    "vss-web-extension-sdk": "^1.96.1"
   },
   "name": "",
   "private": true,
