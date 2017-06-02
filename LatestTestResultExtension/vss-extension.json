@@ -1,12 +1,29 @@
 {
   "manifestVersion": 1,
-  "id": "devviewlatesttestresult",
-  "version": "1.0.1",
-  "name": "Dev: View Latest Test Result",
+  "id": "viewlatesttestresult",
+  "version": "1.0.3",
+  "name": "View Latest Test Result",
   "scopes": [ "vso.work", "vso.test" ],
   "description": "Allows you to easily view the latest test results for a test case from the work item form.",
-  "baseUri": "https://localhost:44300",
   "publisher": "keesverhaar",
+  "files": [
+    {
+        "path": "img",
+        "addressable": true
+    },
+    {
+        "path": "libs",
+        "addressable": true
+    },
+    {
+        "path": "src",
+        "addressable": true
+    },
+    {
+        "path": "marketplace",
+        "addressable": true
+    }
+  ],
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services"
@@ -14,7 +31,7 @@
   ],
   "content": {
     "details": {
-      "path":  "doc/Overview.md"
+      "path": "doc/Overview.md"
     }
   },
   "screenshots": [
@@ -25,9 +42,9 @@
       "path": "doc/ContextMenu.jpg"
     }
   ],
-  "public": false,
+  "public": true,
   "icons": {
-    "default": "img/icon.png"
+    "default": "marketplace/icon.png"
   },
   "tags": [
     "Test"
@@ -69,7 +86,7 @@
       "properties": {
         "name": "Test Results",
         "order": 100,
-        "uri": "index.html"
+        "uri": "src/index.html"
       }
     }
   ]

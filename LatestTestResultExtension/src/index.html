@@ -4,8 +4,8 @@
 <head>
     <meta charset="utf-8" />
     <title>TypeScript HTML App</title>
-    <link rel="stylesheet" href="css/app.css" type="text/css" />
-    <script src="scripts/VSS.SDK.js"></script>
+    <script src="../libs/VSS.SDK.min.js"></script>
+
 </head>
 <body>
     <script type="text/javascript">
@@ -24,22 +24,16 @@
 
         //// Wait for the SDK to be initialized
         VSS.ready(function () {
-            require(["Scripts/testResultsTab"], function () { });
+            require(["src/app"], function (app) {
+                VSS.register(VSS.getContribution().id, app.register);
+                VSS.notifyLoadSucceeded();
+            });
         });
 
     </script>
 
-    <div class="grid-group">
-        <div class="form-header">
-            <h1>Latest test results</h1>
-        </div>
-
-        <p>These are the latest test results for this test case for each plan, suite &amp; configuration in which it is included.</p>
-
-        <img src="img/throbber.gif" id="loading" />
-
-        <div id="test-result-container"></div>
-        <p style="color: red; font-style: italic" id="test-result-error"></p>
+    <div id="latesttestresults" class="grid-group">
+        <img src="../img/throbber.gif" id="loading" />
     </div>
 </body>
 </html>
