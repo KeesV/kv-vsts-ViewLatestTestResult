@@ -12,10 +12,12 @@ export class Header extends React.Component<IHeaderProps, null> {
     public render(): JSX.Element {
         let rightHeader: JSX.Element = null;
         return (
-            <div className="hub-title">
-                <div className="title-left">
-                    {this.props.title}
-                </div>
+            <div className="tfs-collapsible-header wit-form-group-header disabled">
+                <span className="tfs-collapsible-text" role="button">
+                    <p role="heading">
+                        {this.props.title}
+                    </p>
+                </span>
             </div>
         );
     }

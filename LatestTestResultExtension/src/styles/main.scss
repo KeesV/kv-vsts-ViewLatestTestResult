@@ -2,7 +2,21 @@
 
 @import "./components/all";
 
-.loader {
-    margin-top: 80px;
-    text-align: center
+
+html {
+    margin: 0px;
+    padding: 0px;
 }
+
+.grid-group {
+    box-sizing: border-box;
+    color: #222;
+    display: block;
+    padding: 5px 5px 0px 14px;
+    margin: 0px;
+}
+
+// .loader {
+//     margin-top: 80px;
+//     text-align: center
+// }
