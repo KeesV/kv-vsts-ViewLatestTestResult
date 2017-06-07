@@ -31,24 +31,29 @@ export class TestResultsContent extends React.Component<null, ITestResultsConten
             <div className="tfs-collapsible-content">
                 <Error text={this.state.errorText} />               
                 {/*<p>These are the latest test results for this test case for each plan, suite &amp; configuration in which it is included.</p>*/}
-                <TestResultsTable testresults={this.state.testresults}/>
+                { this.state.errorText.length === 0 && <TestResultsTable testresults={this.state.testresults}/> }
             </div>
         );
     }
 
     private _refreshData() {
-        this.service.getTestResultsForTestCase(1).then(testResults => {
-            this.state.testresults = testResults;
-            this.state.errorText = "";
-            this.setState(this.state);
+        this.service.ActiveWorkItemIsTestCase().then(isTestCase => {
+            if (isTestCase) {
+                this.service.getTestResultsForActiveTestCase().then(testResults => {
+                    this.setState({ testresults: testResults, errorText: "" });
+                });
+            } else {
+                this.setState({ testresults: null, errorText: "This is not a test case, so we can't display recent test results." });
+            }
         });
+
         this.setState(this.state);
     }
 
     private _getInitialState(): ITestResultsContentState {
         return {
             testresults: [],
-            errorText: "Hello!"
+            errorText: ""
         };
     }
 }

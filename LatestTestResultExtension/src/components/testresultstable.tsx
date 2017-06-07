@@ -3,6 +3,7 @@ import * as React from "react";
 import { DetailsList, CheckboxVisibility, IColumn, DetailsListLayoutMode } from "office-ui-fabric-react/lib-amd/DetailsList";
 import { ContextualMenu, IContextualMenuItem } from "office-ui-fabric-react/lib-amd/ContextualMenu";
 import { Selection, SelectionMode } from "office-ui-fabric-react/lib-amd/utilities/selection";
+import { Image, ImageFit } from "office-ui-fabric-react/lib-amd/Image";
 import { autobind } from "office-ui-fabric-react/lib-amd/Utilities";
 
 import { ITestResult } from "../models/itestresult";
@@ -39,8 +40,47 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
         let fieldContent = item[column.fieldName];
 
         switch (column.key) {
+            case "outcomeColumn":
+                let formattedOutcome: JSX.Element;
+
+                switch (fieldContent) {
+                    case "Unspecified":
+                        formattedOutcome = <span><div style={{display: "inline-block"}}><Image imageFit={ImageFit.none} src="./icons/active.png"/></div><div style={{display: "inline-block", margin: "0px 0px 0px 4px"}}>Active</div></span>;
+                    break;
+
+                    case "Blocked":
+                        formattedOutcome = <span><div style={{display: "inline-block"}}><Image imageFit={ImageFit.none} src="./icons/blocked.png"/></div><div style={{display: "inline-block", margin: "0px 0px 0px 4px"}}>Blocked</div></span>;
+                    break;
+
+                    case "Failed":
+                        formattedOutcome = <span><div style={{display: "inline-block"}}><Image imageFit={ImageFit.none} src="./icons/failed.png"/></div><div style={{display: "inline-block", margin: "0px 0px 0px 4px"}}>Failed</div></span>;
+                    break;
+
+                    case "None":
+                        formattedOutcome = <span><div style={{display: "inline-block"}}><Image imageFit={ImageFit.none} src="./icons/inprogress.png"/></div><div style={{display: "inline-block", margin: "0px 0px 0px 4px"}}>In progress</div></span>;
+                    break;
+
+                    case "NotApplicable":
+                        formattedOutcome = <span><div style={{display: "inline-block"}}><Image imageFit={ImageFit.none} src="./icons/notapplicable.png"/></div><div style={{display: "inline-block", margin: "0px 0px 0px 4px"}}>Not applicable</div></span>;
+                    break;
+
+                    case "Passed":
+                        formattedOutcome = <span><div style={{display: "inline-block"}}><Image imageFit={ImageFit.none} src="./icons/passed.png"/></div><div style={{display: "inline-block", margin: "0px 0px 0px 4px"}}>Passed</div></span>;
+                    break;
+
+                    case "Paused":
+                        formattedOutcome = <span><div style={{display: "inline-block"}}><Image imageFit={ImageFit.none} src="./icons/paused.png"/></div><div style={{display: "inline-block", margin: "0px 0px 0px 4px"}}>Paused</div></span>;
+                    break;
+
+                    default:
+                        formattedOutcome = <span>{ fieldContent }</span>;
+                    break;
+                }
+
+                return formattedOutcome;
+
             default:
-            return <span>{ fieldContent }</span>;
+                return <span>{ fieldContent }</span>;
         }
     }
 
