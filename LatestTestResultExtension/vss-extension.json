@@ -8,10 +8,6 @@
   "publisher": "keesverhaar",
   "files": [
     {
-        "path": "img",
-        "addressable": true
-    },
-    {
         "path": "libs",
         "addressable": true
     },

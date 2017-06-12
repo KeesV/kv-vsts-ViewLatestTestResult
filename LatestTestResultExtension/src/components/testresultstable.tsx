@@ -1,7 +1,8 @@
 import * as React from "react";
 
 import { DetailsList, CheckboxVisibility, IColumn, DetailsListLayoutMode } from "office-ui-fabric-react/lib-amd/DetailsList";
-import { ContextualMenu, IContextualMenuItem } from "office-ui-fabric-react/lib-amd/ContextualMenu";
+import { ContextualMenu, IContextualMenuItem, IContextualMenuProps } from "office-ui-fabric-react/lib-amd/ContextualMenu";
+import { DefaultButton, IButtonProps } from "office-ui-fabric-react/lib-amd/Button";
 import { Selection, SelectionMode } from "office-ui-fabric-react/lib-amd/utilities/selection";
 import { Image, ImageFit } from "office-ui-fabric-react/lib-amd/Image";
 import { autobind } from "office-ui-fabric-react/lib-amd/Utilities";
@@ -15,10 +16,6 @@ export interface ITestResultsTableProps {
 interface ITestResultsTableState {
     isContextMenuVisible?: boolean;
     contextMenuTarget?: MouseEvent;
-}
-
-export interface IContextMenuProps {
-    menuItems?: IContextualMenuItem[];
 }
 
 enum TestResultsDetailsType {
@@ -36,7 +33,7 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
         this._selection = new Selection();
     }
 
-    private _renderItemColumn(item, index, column) {
+    private _renderItemColumn(item, index, column): JSX.Element {
         let fieldContent = item[column.fieldName];
 
         switch (column.key) {
@@ -79,11 +76,56 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
 
                 return formattedOutcome;
 
+            case "planColumn":
+                let btn: JSX.Element =
+                    <DefaultButton
+                        text="..."
+                        style={{float: "right", width: "30px", minWidth: "30px", margin: "0px 0px 0px 0px", textAlign: "center"}}
+                        menuProps={
+                            {
+                                items: [
+                                        {
+                                            key: "gotoPlan",
+                                            name: "View Plan",
+                                            canCheck: false,
+                                            onClick: null
+                                        },
+                                        {
+                                            key: "gotoSuite",
+                                            name: "View Suite",
+                                            canCheck: false,
+                                            onClick: (() => { this.showDetails.bind(this, [ TestResultsDetailsType.Suite ]); })
+                                        },
+                                        {
+                                            key: "gotoRun",
+                                            name: "View Run",
+                                            canCheck: false,
+                                            onClick: (() => { this.showDetails(TestResultsDetailsType.Run); })
+                                        }
+                                ],
+                                isBeakVisible: false
+                            }
+                        }
+                        menuIconProps= {
+                            {
+                                iconName: null
+                            }
+                        }
+                    />;
+            return <span>{ fieldContent }</span>;
+            // return <div><div style={{display: "inline-block"}}>{ fieldContent }</div>{ btn }</div>;
+
             default:
                 return <span>{ fieldContent }</span>;
         }
     }
 
+    @autobind
+    private showDetailsEvent() {
+        console.log("Clicked plan!");
+    }
+
+    @autobind
     private showDetails(detailsType: TestResultsDetailsType) {
         let selectedItem: ITestResult = this._selection.getSelection()[0] as ITestResult;
 
@@ -154,10 +196,18 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
     private _renderGrid(): JSX.Element {
         let _columns: IColumn[] = [
             {
+                key: "outcomeColumn",
+                name: "Outcome",
+                fieldName: "outcome",
+                minWidth: 100,
+                maxWidth: null,
+                isResizable: true
+            },
+            {
                 key: "planColumn",
                 name: "Plan",
                 fieldName: "plan",
-                minWidth: 100,
+                minWidth: 150,
                 maxWidth: null,
                 isResizable: true
             },
@@ -165,7 +215,7 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
                 key: "suiteColumn",
                 name: "Suite",
                 fieldName: "suite",
-                minWidth: 100,
+                minWidth: 150,
                 maxWidth: null,
                 isResizable: true
             },
@@ -173,15 +223,7 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
                 key: "configurationColumn",
                 name: "Configuration",
                 fieldName: "configuration",
-                minWidth: 100,
-                maxWidth: null,
-                isResizable: true
-            },
-            {
-                key: "outcomeColumn",
-                name: "Outcome",
-                fieldName: "outcome",
-                minWidth: 100,
+                minWidth: 150,
                 maxWidth: null,
                 isResizable: true
             }

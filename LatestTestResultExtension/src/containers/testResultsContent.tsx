@@ -1,7 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { TestResultsTable, IContextMenuProps } from "../components/testresultstable";
+import { Spinner, SpinnerSize } from "office-ui-fabric-react/lib-amd/Spinner";
+
+import { TestResultsTable } from "../components/testresultstable";
 import { Error } from "../components/error";
 
 import { ITestResult } from "../models/itestresult";
@@ -11,6 +13,7 @@ import { VSTSService } from "../services/vstsService";
 export interface ITestResultsContentState {
     testresults?: ITestResult[];
     errorText?: string;
+    isLoading: boolean;
 }
 
 export class TestResultsContent extends React.Component<null, ITestResultsContentState> {
@@ -27,11 +30,19 @@ export class TestResultsContent extends React.Component<null, ITestResultsConten
     }
 
     public render(): JSX.Element {
+        let content: JSX.Element = null;
+
+        if (this.state.isLoading) {
+            content = <Spinner size={SpinnerSize.large} />;
+        } else {
+            if (this.state.errorText.length === 0) {
+                content = <TestResultsTable testresults={this.state.testresults}/>;
+            }
+        }
         return (
             <div className="tfs-collapsible-content">
-                <Error text={this.state.errorText} />               
-                {/*<p>These are the latest test results for this test case for each plan, suite &amp; configuration in which it is included.</p>*/}
-                { this.state.errorText.length === 0 && <TestResultsTable testresults={this.state.testresults}/> }
+                <Error text={this.state.errorText} />             
+                { content }
             </div>
         );
     }
@@ -40,10 +51,10 @@ export class TestResultsContent extends React.Component<null, ITestResultsConten
         this.service.ActiveWorkItemIsTestCase().then(isTestCase => {
             if (isTestCase) {
                 this.service.getTestResultsForActiveTestCase().then(testResults => {
-                    this.setState({ testresults: testResults, errorText: "" });
+                    this.setState({ testresults: testResults, errorText: "", isLoading: false });
                 });
             } else {
-                this.setState({ testresults: null, errorText: "This is not a test case, so we can't display recent test results." });
+                this.setState({ testresults: null, errorText: "This is not a test case, so we can't display recent test results.", isLoading: false });
             }
         });
 
@@ -53,7 +64,8 @@ export class TestResultsContent extends React.Component<null, ITestResultsConten
     private _getInitialState(): ITestResultsContentState {
         return {
             testresults: [],
-            errorText: ""
+            errorText: "",
+            isLoading: true
         };
     }
 }
