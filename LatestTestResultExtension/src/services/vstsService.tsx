@@ -4,12 +4,16 @@ import Q = require("q");
 
 import WorkItemServices = require("TFS/WorkItemTracking/Services");
 import TestManagementRestClient = require("TFS/TestManagement/RestClient");
+import HostNavigationService = require("VSS/SDK/Services/Navigation");
 
 import { ITestResult } from "../models/itestresult";
 
 export class VSTSService {
     private _workItemFormService: IPromise<WorkItemServices.IWorkItemFormService>;
     private _testManagementRestClient: TestManagementRestClient.TestHttpClient3_1;
+    private _hostNavigationService: IPromise<HostNavigationService.HostNavigationService>;
+
+    private _webContext: WebContext;
 
     constructor() {
         this.initialize();
@@ -18,7 +22,9 @@ export class VSTSService {
     private initialize() {
         this._workItemFormService = WorkItemServices.WorkItemFormService.getService();
         this._testManagementRestClient = TestManagementRestClient.getClient();
+        this._hostNavigationService = VSS.getService(VSS.ServiceIds.Navigation);
 
+        this._webContext = VSS.getWebContext();
     }
 
     public ActiveWorkItemIsTestCase(): IPromise<boolean> {
@@ -115,5 +121,27 @@ export class VSTSService {
         //     ];
 
         return defer.promise;
+    }
+
+    public navigateToTestRun(testResult: ITestResult) {
+        console.log("Navigating to test run: " + testResult.runId);
+
+        this._testManagementRestClient.getTestRunById(testResult.projectId, Number(testResult.runId)).then((run) => {
+            this._hostNavigationService.then(s => s.navigate(run.webAccessUrl));
+        });
+    }
+
+    public navigateToTestSuite(testResult: ITestResult) {
+        console.log("Navigating to test suite " + testResult.suite);
+
+        let url: string = `${this._webContext.collection.uri}${this._webContext.project.name}/_testManagement?planId=${testResult.planId}&suiteId=${testResult.suiteId}`;
+        this._hostNavigationService.then(s => s.navigate(url));
+    }
+
+    public navigateToTestPlan(testResult: ITestResult) {
+        console.log("Navigating to test plan " + testResult.plan);
+
+        let url: string = `${this._webContext.collection.uri}${this._webContext.project.name}/_testManagement?planId=${testResult.planId}`;
+        this._hostNavigationService.then(s => s.navigate(url));
     }
 }

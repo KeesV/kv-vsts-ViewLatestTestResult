@@ -8,6 +8,7 @@ import { Image, ImageFit } from "office-ui-fabric-react/lib-amd/Image";
 import { autobind } from "office-ui-fabric-react/lib-amd/Utilities";
 
 import { ITestResult } from "../models/itestresult";
+import { VSTSService } from "../services/vstsService";
 
 export interface ITestResultsTableProps {
     testresults?: ITestResult[];
@@ -16,6 +17,7 @@ export interface ITestResultsTableProps {
 interface ITestResultsTableState {
     isContextMenuVisible?: boolean;
     contextMenuTarget?: MouseEvent;
+    selection?: Selection;
 }
 
 enum TestResultsDetailsType {
@@ -25,12 +27,13 @@ enum TestResultsDetailsType {
 }
 
 export class TestResultsTable extends React.Component<ITestResultsTableProps, ITestResultsTableState> {
-    private _selection: Selection;
+    private service: VSTSService;
 
     constructor(props?: ITestResultsTableProps, context?: any) {
         super(props, context);
         this.state = this._getInitialState();
-        this._selection = new Selection();
+
+        this.service = new VSTSService();
     }
 
     private _renderItemColumn(item, index, column): JSX.Element {
@@ -74,46 +77,23 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
                     break;
                 }
 
-                return formattedOutcome;
+                return ( formattedOutcome );
 
             case "planColumn":
                 let btn: JSX.Element =
                     <DefaultButton
-                        text="..."
                         style={{float: "right", width: "30px", minWidth: "30px", margin: "0px 0px 0px 0px", textAlign: "center"}}
-                        menuProps={
-                            {
-                                items: [
-                                        {
-                                            key: "gotoPlan",
-                                            name: "View Plan",
-                                            canCheck: false,
-                                            onClick: null
-                                        },
-                                        {
-                                            key: "gotoSuite",
-                                            name: "View Suite",
-                                            canCheck: false,
-                                            onClick: (() => { this.showDetails.bind(this, [ TestResultsDetailsType.Suite ]); })
-                                        },
-                                        {
-                                            key: "gotoRun",
-                                            name: "View Run",
-                                            canCheck: false,
-                                            onClick: (() => { this.showDetails(TestResultsDetailsType.Run); })
-                                        }
-                                ],
-                                isBeakVisible: false
-                            }
-                        }
+                        menuProps= { {
+                            items: this._buildContextMenuItems(),
+                            isBeakVisible: false
+                        } }
                         menuIconProps= {
                             {
                                 iconName: null
                             }
                         }
-                    />;
-            return <span>{ fieldContent }</span>;
-            // return <div><div style={{display: "inline-block"}}>{ fieldContent }</div>{ btn }</div>;
+                >...</DefaultButton>;
+            return <div><div style={{display: "inline-block"}}>{ fieldContent }</div>{ btn }</div>;
 
             default:
                 return <span>{ fieldContent }</span>;
@@ -121,47 +101,47 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
     }
 
     @autobind
-    private showDetailsEvent() {
-        console.log("Clicked plan!");
-    }
-
-    @autobind
     private showDetails(detailsType: TestResultsDetailsType) {
-        let selectedItem: ITestResult = this._selection.getSelection()[0] as ITestResult;
+        let selectedItem: ITestResult = this.state.selection.getSelection()[0] as ITestResult;
 
         switch (detailsType) {
             case TestResultsDetailsType.Plan:
-                console.log(`Navigating to plan: ${selectedItem.plan}`);
+                this.service.navigateToTestPlan(selectedItem);
             break;
 
             case TestResultsDetailsType.Suite:
-                console.log(`Navigating to suite: ${selectedItem.suite}`);
+                this.service.navigateToTestSuite(selectedItem);
             break;
 
             case TestResultsDetailsType.Run:
-                console.log(`Navigating to run: ${selectedItem.runId}`);
+                this.service.navigateToTestRun(selectedItem);
             break;
         }
     }
 
     @autobind
-    private _showContextMenu(item?: any, index?: number, e?: MouseEvent) {
-        if (!this._selection.isIndexSelected(index)) {
+    private _showContextMenu(item?: any, index?: number, e?: Event) {
+        let newState: ITestResultsTableState = this.state;
+
+        if (!this.state.selection.isIndexSelected(index)) {
             // if not already selected, unselect every other row and select this one
-            this._selection.setAllSelected(false);
-            this._selection.setIndexSelected(index, true, true);
+            let newSelection: Selection = this.state.selection;
+            newSelection.setAllSelected(false);
+            newSelection.setIndexSelected(index, true, true);
+
+            newState.selection = newSelection;
         }
-        this.setState({
-            contextMenuTarget: e,
-            isContextMenuVisible: true
-        });
+        newState.isContextMenuVisible = true;
+        newState.contextMenuTarget = e as MouseEvent;
+        this.setState(newState);
     }
 
     @autobind _hideContextMenu() {
-        this.setState({
-            contextMenuTarget: null,
-            isContextMenuVisible: false
-        });
+        let newState: ITestResultsTableState = this.state;
+        newState.contextMenuTarget = null;
+        newState.isContextMenuVisible = false;
+
+        this.setState(newState);
     }
 
     private _buildContextMenuItems(): IContextualMenuItem[] {
@@ -230,16 +210,14 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
         ];
 
         return (
-            <div>
-                <DetailsList
-                    items={this.props.testresults}
-                    columns={_columns}
-                    checkboxVisibility={CheckboxVisibility.hidden}
-                    layoutMode={DetailsListLayoutMode.fixedColumns}
-                    onRenderItemColumn={ this._renderItemColumn }
-                    onItemContextMenu={this._showContextMenu}
-                    selection={this._selection} />
-            </div>
+            <DetailsList
+                items={this.props.testresults}
+                columns={_columns}
+                checkboxVisibility={CheckboxVisibility.hidden}
+                layoutMode={DetailsListLayoutMode.fixedColumns}
+                onRenderItemColumn={ (item, index, column) => this._renderItemColumn(item, index, column) }
+                onItemContextMenu={ (item, index, e) => this._showContextMenu(item, index, e)}
+                selection={this.state.selection} />
         );
     }
 
@@ -263,7 +241,8 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
     private _getInitialState(): ITestResultsTableState {
         return {
             contextMenuTarget: null,
-            isContextMenuVisible: false
+            isContextMenuVisible: false,
+            selection: new Selection()
         };
     }
 }
