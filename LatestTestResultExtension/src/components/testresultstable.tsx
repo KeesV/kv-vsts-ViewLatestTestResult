@@ -16,6 +16,7 @@ export interface ITestResultsTableProps {
 
 interface ITestResultsTableState {
     isContextMenuVisible?: boolean;
+    contextMenuItems: IContextualMenuItem[];
     contextMenuTarget?: MouseEvent;
     selection?: Selection;
 }
@@ -84,7 +85,7 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
                     <DefaultButton
                         style={{float: "right", width: "30px", minWidth: "30px", margin: "0px 0px 0px 0px", textAlign: "center"}}
                         menuProps= { {
-                            items: this._buildContextMenuItems(),
+                            items: this.state.contextMenuItems,
                             isBeakVisible: false
                         } }
                         menuIconProps= {
@@ -92,6 +93,7 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
                                 iconName: null
                             }
                         }
+                        onClick={() => this._buildContextMenuItemsForTestResult(this.state.selection.getSelection()[0] as ITestResult) }
                 >...</DefaultButton>;
             return <div><div style={{display: "inline-block"}}>{ fieldContent }</div>{ btn }</div>;
 
@@ -120,7 +122,7 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
     }
 
     @autobind
-    private _showContextMenu(item?: any, index?: number, e?: Event) {
+    private _showContextMenu(item?: ITestResult, index?: number, e?: Event) {
         let newState: ITestResultsTableState = this.state;
 
         if (!this.state.selection.isIndexSelected(index)) {
@@ -133,10 +135,12 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
         }
         newState.isContextMenuVisible = true;
         newState.contextMenuTarget = e as MouseEvent;
+        newState.contextMenuItems = this._buildContextMenuItemsForTestResult(item);
         this.setState(newState);
     }
 
-    @autobind _hideContextMenu() {
+    @autobind
+    private _hideContextMenu() {
         let newState: ITestResultsTableState = this.state;
         newState.contextMenuTarget = null;
         newState.isContextMenuVisible = false;
@@ -144,25 +148,32 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
         this.setState(newState);
     }
 
-    private _buildContextMenuItems(): IContextualMenuItem[] {
+    private _buildContextMenuItemsForTestResult(testresult: ITestResult): IContextualMenuItem[] {
+        let planId: number = +testresult.planId;
+        let suiteId: number = +testresult.suiteId;
+        let runId: number = +testresult.runId;
+
         let contextMenuProps: IContextualMenuItem[] =
             [
                 {
                     key: "gotoPlan",
                     name: "View Plan",
                     canCheck: false,
+                    disabled: planId === 0 ? true : false,
                     onClick: (() => { this.showDetails(TestResultsDetailsType.Plan); })
                 },
                 {
                     key: "gotoSuite",
                     name: "View Suite",
                     canCheck: false,
+                    disabled: suiteId === 0 ? true : false,
                     onClick: (() => { this.showDetails(TestResultsDetailsType.Suite); })
                 },
                 {
                     key: "gotoRun",
                     name: "View Run",
                     canCheck: false,
+                    disabled: runId === 0 ? true : false,
                     onClick: (() => { this.showDetails(TestResultsDetailsType.Run); })
                 }
             ];
@@ -229,7 +240,7 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
                 {this.state.isContextMenuVisible ? (
                     <ContextualMenu
                         className="context-menu"
-                        items={this._buildContextMenuItems()}
+                        items={this.state.contextMenuItems}
                         target={this.state.contextMenuTarget}
                         shouldFocusOnMount={true}
                         onDismiss={this._hideContextMenu} />
@@ -241,6 +252,7 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
     private _getInitialState(): ITestResultsTableState {
         return {
             contextMenuTarget: null,
+            contextMenuItems: null,
             isContextMenuVisible: false,
             selection: new Selection()
         };
