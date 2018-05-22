@@ -10,7 +10,6 @@ export class TestResults extends React.Component<null, null> {
     public render(): JSX.Element {
         return (
             <div>
-                <Header title="Latest test results" />
                 <TestResultsContent />
             </div>
         );

@@ -2,6 +2,6 @@
     "public": false,
     "baseUri": "https://localhost:3000",
     "name": "Dev: View Latest Test Result",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "publisher": "keesverhaar"
 }

@@ -80,22 +80,22 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
 
                 return ( formattedOutcome );
 
-            case "planColumn":
-                let btn: JSX.Element =
-                    <DefaultButton
-                        style={{float: "right", width: "30px", minWidth: "30px", margin: "0px 0px 0px 0px", textAlign: "center"}}
-                        menuProps= { {
-                            items: this.state.contextMenuItems,
-                            isBeakVisible: false
-                        } }
-                        menuIconProps= {
-                            {
-                                iconName: null
-                            }
-                        }
-                        onClick={() => this._buildContextMenuItemsForTestResult(this.state.selection.getSelection()[0] as ITestResult) }
-                >...</DefaultButton>;
-            return <div><div style={{display: "inline-block"}}>{ fieldContent }</div>{ btn }</div>;
+            // case "planColumn":
+            //     let btn: JSX.Element =
+            //         <DefaultButton
+            //             style={{float: "right", width: "30px", minWidth: "30px", margin: "0px 0px 0px 0px", textAlign: "center"}}
+            //             menuProps= { {
+            //                 items: this.state.contextMenuItems,
+            //                 isBeakVisible: false
+            //             } }
+            //             menuIconProps= {
+            //                 {
+            //                     iconName: null
+            //                 }
+            //             }
+            //             onClick={() => this._buildContextMenuItemsForTestResult(this.state.selection.getSelection()[0] as ITestResult) }
+            //     >...</DefaultButton>;
+            // return <div><div style={{display: "inline-block"}}>{ fieldContent }</div>{ btn }</div>;
 
             default:
                 return <span>{ fieldContent }</span>;

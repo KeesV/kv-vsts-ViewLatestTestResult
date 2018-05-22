@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "viewlatesttestresult",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "name": "View Latest Test Result",
   "scopes": [ "vso.work", "vso.test" ],
   "description": "Allows you to easily view the latest test results for a test case from the work item form.",
@@ -80,10 +80,24 @@
       ],
       "type": "ms.vss-work-web.work-item-form-page",
       "properties": {
-        "name": "Test Results",
+        "name": "Test Results - Deprecated",
         "order": 100,
-        "uri": "src/index.html"
+        "uri": "src/deprecated.html"
       }
+    },
+    {  
+        "id": "test-results-control",
+        "type": "ms.vss-work-web.work-item-form-control",
+        "description": "View latest test results for a test case on the work item form.",
+        "targets": [
+            "ms.vss-work-web.work-item-form"
+        ],
+        "properties": {
+            "name": "Latest Test Results",
+            "uri": "src/index.html",
+            "height": 600
+        }
     }
+
   ]
 }
