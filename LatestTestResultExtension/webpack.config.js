@@ -4,6 +4,7 @@ var CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
     target: "web",
+    mode: "development",
     entry: {
         app: "./src/app.tsx"
     },
@@ -17,31 +18,29 @@ module.exports = {
     devtool: "inline-source-map",
     resolve: {
         extensions: [
-            "",
             ".webpack.js",
             ".web.js",
             ".ts",
             ".tsx",
-            ".js"],
-        root: [
-            path.resolve("./src")
-        ]
+            ".js"]
     },
     module: {
-        preLoaders: [
+        rules: [
+            {
+                enforce: 'pre',
+                test: /\.tsx?$/,
+                loader: "tslint-loader",
+                exclude: /(node_modules)/
+            },
             {
                 test: /\.tsx?$/,
-                loader: "tslint"
-            }
-        ],
-        loaders: [
-            {
-                test: /\.tsx?$/,
-                loader: "ts-loader"
+                loader: "ts-loader",
+                exclude: /(node_modules)/                
             },
             {
                 test: /\.s?css$/,
-                loaders: ["style", "css", "sass"]
+                loaders: ["style-loader", "css-loader", "sass-loader"],
+                exclude: /(node_modules)/
             }
         ]
     },

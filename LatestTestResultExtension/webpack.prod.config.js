@@ -4,6 +4,7 @@ var CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
     target: "web",
+    mode: "production",
     entry: {
         app: "./src/app.tsx"
     },
@@ -16,31 +17,23 @@ module.exports = {
     ],
     resolve: {
         extensions: [
-            "",
             ".webpack.js",
             ".web.js",
             ".ts",
             ".tsx",
-            ".js"],
-        root: [
-            path.resolve("./src")
-        ]
+            ".js"]
     },
     module: {
-        preLoaders: [
+        rules: [
             {
                 test: /\.tsx?$/,
-                loader: "tslint"
-            }
-        ],
-        loaders: [
-            {
-                test: /\.tsx?$/,
-                loader: "ts-loader"
+                loader: "ts-loader",
+                exclude: /(node_modules)/                
             },
             {
                 test: /\.s?css$/,
-                loaders: ["style", "css", "sass"]
+                loaders: ["style-loader", "css-loader", "sass-loader"],
+                exclude: /(node_modules)/
             }
         ]
     },
@@ -49,7 +42,8 @@ module.exports = {
             { from: "./src/*.html", to: "./" },
             { from: "./libs", to: "libs" },
             { from: "./marketplace", to: "marketplace" },
-            { from: "./vss-extension.json", to: "vss-extension.json" }
+            { from: "./vss-extension.json", to: "vss-extension.json" },
+            { from: "./doc", to: "doc" }
         ])
     ]
 }

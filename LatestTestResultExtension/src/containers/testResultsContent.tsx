@@ -41,7 +41,7 @@ export class TestResultsContent extends React.Component<null, ITestResultsConten
         }
         return (
             <div className="tfs-collapsible-content">
-                <Error text={this.state.errorText} />             
+                <Error text={this.state.errorText} />
                 { content }
             </div>
         );

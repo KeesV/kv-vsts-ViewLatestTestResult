@@ -10,7 +10,7 @@ import { ITestResult } from "../models/itestresult";
 
 export class VSTSService {
     private _workItemFormService: IPromise<WorkItemServices.IWorkItemFormService>;
-    private _testManagementRestClient: TestManagementRestClient.TestHttpClient3_1;
+    private _testManagementRestClient: TestManagementRestClient.TestHttpClient4_1;
     private _hostNavigationService: IPromise<HostNavigationService.HostNavigationService>;
 
     private _webContext: WebContext;
@@ -27,7 +27,7 @@ export class VSTSService {
         this._webContext = VSS.getWebContext();
     }
 
-    public ActiveWorkItemIsTestCase(): IPromise<boolean> {
+    public ActiveWorkItemIsTestCase(): Q.Promise<boolean> {
         let defer = Q.defer<boolean>();
         this._workItemFormService.then((svc) => {
             svc.getFieldValue("System.WorkItemType", false).then((wit) => {
@@ -43,7 +43,7 @@ export class VSTSService {
         return defer.promise;
     }
 
-    public getTestResultsForActiveTestCase(): IPromise<ITestResult[]> {
+    public getTestResultsForActiveTestCase(): Q.Promise<ITestResult[]> {
         let defer = Q.defer<ITestResult[]>();
         this._workItemFormService.then((svc) => {
             svc.getId().then((id) => {
@@ -55,7 +55,7 @@ export class VSTSService {
         return defer.promise;
     }
 
-    public getTestResultsForTestCase(testcaseId: number): IPromise<ITestResult[]> {
+    public getTestResultsForTestCase(testcaseId: number): Q.Promise<ITestResult[]> {
         console.log("Getting test results for test case id " + testcaseId);
         let defer = Q.defer<ITestResult[]>();
 
