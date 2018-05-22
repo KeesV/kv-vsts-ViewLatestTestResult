@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "viewlatesttestresult",
-  "version": "1.0.4",
+  "version": "2.0.5",
   "name": "View Latest Test Result",
   "scopes": [ "vso.work", "vso.test" ],
   "description": "Allows you to easily view the latest test results for a test case from the work item form.",
@@ -18,6 +18,10 @@
     {
         "path": "marketplace",
         "addressable": true
+    },
+    {
+      "path": "doc",
+      "addressable": true
     }
   ],
   "targets": [
@@ -27,7 +31,7 @@
   ],
   "content": {
     "details": {
-      "path": "doc/Overview.md"
+      "path": "Overview.md"
     }
   },
   "screenshots": [

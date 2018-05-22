@@ -40,9 +40,11 @@ module.exports = {
     plugins: [
         new CopyWebpackPlugin([
             { from: "./src/*.html", to: "./" },
+            { from: "./src/icons", to: "src/icons" },
             { from: "./libs", to: "libs" },
             { from: "./marketplace", to: "marketplace" },
             { from: "./vss-extension.json", to: "vss-extension.json" },
+            { from: "./Overview.md", to: "Overview.md" },
             { from: "./doc", to: "doc" }
         ])
     ]

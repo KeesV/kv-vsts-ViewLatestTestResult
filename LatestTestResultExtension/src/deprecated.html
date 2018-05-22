@@ -24,6 +24,7 @@
 
         //// Wait for the SDK to be initialized
         VSS.ready(function () {
+            VSS.register(VSS.getContribution().id, {}); //Register doing nothing...
             VSS.notifyLoadSucceeded();
         });
 
@@ -33,7 +34,7 @@
         <p>This is the "View Latest Test Results" extension, implemented as a work item form tab.</p> 
         <p>This implementation is deprecated, and replaced by a custom work item form control. That makes it possible to only show the extension on relevant work item types. This text is just here to point you to the custom control implementation, and will be removed in a future release.</p> 
 
-        <p>To get started, customize your process template and include the custom control on the "Test Case" work item type. You can have a look at instructions <a>here</a>.</p>
+        <p>To get started, customize your process template and include the custom control on the "Test Case" work item type. You can have a look at instructions <a target="_blank" href="https://marketplace.visualstudio.com/items?itemName=keesverhaar.viewlatesttestresult#overview">here</a>.</p>
     </div>
 </body>
 </html>
