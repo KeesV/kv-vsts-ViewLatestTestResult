@@ -32,13 +32,13 @@ In case of TFS, "classic" Process Template customization needs to be applied (ch
 witadmin exportwitd /collection:CollectionURL /p:Project /n:"Test Case" /f:FileName
 ```
 * Open the file in a text editor and scroll down to the WebLayout section. Add the following lines just **below** the `<WebLayout>` tag:
-```
+```xml
 <Extensions>
    <Extension Id="keesverhaar.viewlatesttestresult" />
 </Extensions>
 ```
 * Add the following lines just **above** the closing `</WebLayout>` tag
-```
+```xml
 <Page Label="Test results" LayoutMode="FirstColumnWide">
   <Section>
 	<Group Label="Test results">
