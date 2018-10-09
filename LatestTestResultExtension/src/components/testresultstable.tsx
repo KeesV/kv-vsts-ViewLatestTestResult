@@ -80,22 +80,18 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
 
                 return ( formattedOutcome );
 
-            // case "planColumn":
-            //     let btn: JSX.Element =
-            //         <DefaultButton
-            //             style={{float: "right", width: "30px", minWidth: "30px", margin: "0px 0px 0px 0px", textAlign: "center"}}
-            //             menuProps= { {
-            //                 items: this.state.contextMenuItems,
-            //                 isBeakVisible: false
-            //             } }
-            //             menuIconProps= {
-            //                 {
-            //                     iconName: null
-            //                 }
-            //             }
-            //             onClick={() => this._buildContextMenuItemsForTestResult(this.state.selection.getSelection()[0] as ITestResult) }
-            //     >...</DefaultButton>;
-            // return <div><div style={{display: "inline-block"}}>{ fieldContent }</div>{ btn }</div>;
+            case "executionDateColumn":
+                let formattedExecutionDate: JSX.Element;
+
+                if ( fieldContent != null ) {
+                    let executionDate: Date;
+                    executionDate = fieldContent;
+                    formattedExecutionDate = <span>{ executionDate.toLocaleString() }</span>;
+                } else {
+                    formattedExecutionDate = <span><i>Never executed</i></span>;
+                }
+
+                return formattedExecutionDate;
 
             default:
                 return <span>{ fieldContent }</span>;
@@ -214,6 +210,14 @@ export class TestResultsTable extends React.Component<ITestResultsTableProps, IT
                 key: "configurationColumn",
                 name: "Configuration",
                 fieldName: "configuration",
+                minWidth: 150,
+                maxWidth: null,
+                isResizable: true
+            },
+            {
+                key: "executionDateColumn",
+                name: "Execution Date",
+                fieldName: "executionDate",
                 minWidth: 150,
                 maxWidth: null,
                 isResizable: true

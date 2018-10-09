@@ -7,4 +7,5 @@ export interface ITestResult {
     runId: string,
     configuration: string;
     outcome: string;
+    executionDate: Date;
 }

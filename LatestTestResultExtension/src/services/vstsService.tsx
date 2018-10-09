@@ -32,10 +32,8 @@ export class VSTSService {
         this._workItemFormService.then((svc) => {
             svc.getFieldValue("System.WorkItemType", false).then((wit) => {
                 if (wit === "Test Case") {
-                    console.log("Active item is a test case");
                     defer.resolve(true);
                 } else {
-                    console.log("Active item is not a test case");
                     defer.resolve(false);
                 }
             });
@@ -56,7 +54,6 @@ export class VSTSService {
     }
 
     public getTestResultsForTestCase(testcaseId: number): Q.Promise<ITestResult[]> {
-        console.log("Getting test results for test case id " + testcaseId);
         let defer = Q.defer<ITestResult[]>();
 
         let results: ITestResult[] = [];
@@ -78,53 +75,47 @@ export class VSTSService {
                     undefined
                 ).then(points => {
                     points.forEach(point => {
-                        results.push(
-                            {
-                                projectId: suite.project.id,
-                                plan: point.testPlan.name,
-                                planId: point.testPlan.id,
-                                suite: point.suite.name,
-                                suiteId: point.suite.id,
-                                runId: point.lastTestRun.id,
-                                configuration: point.configuration.name,
-                                outcome: point.outcome
-                            }
-                        );
+                        if (point.lastTestRun.id !== "0") {
+                            this._testManagementRestClient.getTestResultById(suite.project.id, +point.lastTestRun.id, +point.lastResult.id).then(result => {
+                                results.push(
+                                    {
+                                        projectId: suite.project.id,
+                                        plan: point.testPlan.name,
+                                        planId: point.testPlan.id,
+                                        suite: point.suite.name,
+                                        suiteId: point.suite.id,
+                                        runId: point.lastTestRun.id,
+                                        configuration: point.configuration.name,
+                                        outcome: point.outcome,
+                                        executionDate: result.startedDate
+                                    }
+                                );
+                            });
+                        } else {
+                            results.push(
+                                {
+                                    projectId: suite.project.id,
+                                    plan: point.testPlan.name,
+                                    planId: point.testPlan.id,
+                                    suite: point.suite.name,
+                                    suiteId: point.suite.id,
+                                    runId: null,
+                                    configuration: point.configuration.name,
+                                    outcome: point.outcome,
+                                    executionDate: null
+                                }
+                            );
+                        }
                     });
                     defer.resolve(results);
                 });
             });
         });
 
-        // let testresults =
-        //     [
-        //         {
-        //             planId: "1",
-        //             configuration: "DummyConfig",
-        //             outcome: "DummyFailed",
-        //             plan: "DummyPlan",
-        //             projectId: "1",
-        //             runId: "1",
-        //             suite: "DummySuite",
-        //             suiteId: "1"
-        //         },
-        //         {
-        //             planId: "1",
-        //             configuration: "DummyConfig",
-        //             outcome: "DummyFailed",
-        //             plan: "DummyPlan",
-        //             projectId: "1",
-        //             runId: "1",
-        //             suite: "DummySuite",
-        //             suiteId: "1"
-        //         }
-        //     ];
-
         return defer.promise;
     }
 
     public navigateToTestRun(testResult: ITestResult) {
-        console.log("Navigating to test run: " + testResult.runId);
 
         this._testManagementRestClient.getTestRunById(testResult.projectId, Number(testResult.runId)).then((run) => {
             this._hostNavigationService.then(s => s.navigate(run.webAccessUrl));
@@ -132,14 +123,12 @@ export class VSTSService {
     }
 
     public navigateToTestSuite(testResult: ITestResult) {
-        console.log("Navigating to test suite " + testResult.suite);
 
         let url: string = `${this._webContext.collection.uri}${this._webContext.project.name}/_testManagement?planId=${testResult.planId}&suiteId=${testResult.suiteId}`;
         this._hostNavigationService.then(s => s.navigate(url));
     }
 
     public navigateToTestPlan(testResult: ITestResult) {
-        console.log("Navigating to test plan " + testResult.plan);
 
         let url: string = `${this._webContext.collection.uri}${this._webContext.project.name}/_testManagement?planId=${testResult.planId}`;
         this._hostNavigationService.then(s => s.navigate(url));
