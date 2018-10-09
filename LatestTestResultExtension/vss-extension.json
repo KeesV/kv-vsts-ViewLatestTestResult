@@ -77,18 +77,6 @@
     "Test"
   ],
   "contributions": [
-    {
-      "id": "test-results-page",
-      "targets": [
-        "ms.vss-work-web.work-item-form"
-      ],
-      "type": "ms.vss-work-web.work-item-form-page",
-      "properties": {
-        "name": "Test Results - Deprecated",
-        "order": 100,
-        "uri": "src/deprecated.html"
-      }
-    },
     {  
         "id": "test-results-control",
         "type": "ms.vss-work-web.work-item-form-control",
