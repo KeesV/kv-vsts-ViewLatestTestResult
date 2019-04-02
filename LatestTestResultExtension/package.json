@@ -1,5 +1,6 @@
 {
   "name": "kv-vsts-viewlatesttestresult",
+  "license": "MIT",
   "private": true,
   "version": "0.0.0",
   "main": "webpack.config.js",
