@@ -1,136 +1,126 @@
-/// <reference types="vss-web-extension-sdk" />
+import * as SDK from "azure-devops-extension-sdk";
+import { CommonServiceIds, getClient } from "azure-devops-extension-api";
 
-import Q = require("q");
-
-import WorkItemServices = require("TFS/WorkItemTracking/Services");
-import TestManagementRestClient = require("TFS/TestManagement/RestClient");
-import HostNavigationService = require("VSS/SDK/Services/Navigation");
+import { IWorkItemFormService, WorkItemTrackingServiceIds } from "azure-devops-extension-api/WorkItemTracking";
 
 import { ITestResult } from "../models/itestresult";
+import { TestRestClient, TestResultsQuery } from "azure-devops-extension-api/Test";
+
+const dummTestResult: ITestResult = {
+    configuration: "Some configuration",
+    executionDate:  new Date(),
+    outcome: "Some outcome",
+    plan: "Some plan",
+    planId: "Some plan Id",
+    projectId: "Some project Id",
+    runId: "Some run Id",
+    suite: "Some suite",
+    suiteId: "Some suite Id"
+};
 
 export class VSTSService {
-    private _workItemFormService: IPromise<WorkItemServices.IWorkItemFormService>;
-    private _testManagementRestClient: TestManagementRestClient.TestHttpClient4_1;
-    private _hostNavigationService: IPromise<HostNavigationService.HostNavigationService>;
-
-    private _webContext: WebContext;
+    private _workItemFormService: IWorkItemFormService;
+    private _testManagementRestClient: TestRestClient;
 
     constructor() {
         this.initialize();
     }
 
-    private initialize() {
-        this._workItemFormService = WorkItemServices.WorkItemFormService.getService();
-        this._testManagementRestClient = TestManagementRestClient.getClient();
-        this._hostNavigationService = VSS.getService(VSS.ServiceIds.Navigation);
-
-        this._webContext = VSS.getWebContext();
+    private async initialize() {
+        this._workItemFormService = await SDK.getService<IWorkItemFormService>(WorkItemTrackingServiceIds.WorkItemFormService);
+        this._testManagementRestClient = await getClient(TestRestClient);
     }
 
-    public ActiveWorkItemIsTestCase(): Q.Promise<boolean> {
-        let defer = Q.defer<boolean>();
-        this._workItemFormService.then((svc) => {
-            svc.getFieldValue("System.WorkItemType", false).then((wit) => {
-                if (wit === "Test Case") {
-                    defer.resolve(true);
-                } else {
-                    defer.resolve(false);
-                }
-            });
-        });
-        return defer.promise;
+    public async ActiveWorkItemIsTestCase(): Promise<boolean> {
+        let svc = await this._workItemFormService;
+        let wit = await svc.getFieldValue("System.WorkItemType", false);
+
+        return wit === "Test Case";
     }
 
-    public getTestResultsForActiveTestCase(): Q.Promise<ITestResult[]> {
-        let defer = Q.defer<ITestResult[]>();
-        this._workItemFormService.then((svc) => {
-            svc.getId().then((id) => {
-                this.getTestResultsForTestCase(id).then((results) => {
-                    defer.resolve(results);
-                });
-            });
-        });
-        return defer.promise;
+    public async getTestResultsForActiveTestCase(): Promise<ITestResult[]> {
+        let id = await this._workItemFormService.getId();
+        console.log(id);
+        let results = await this.getTestResultsForTestCase(id);
+        console.log(results);
+        return results;
     }
 
-    public getTestResultsForTestCase(testcaseId: number): Q.Promise<ITestResult[]> {
-        let defer = Q.defer<ITestResult[]>();
-
+    public async getTestResultsForTestCase(testcaseId: number): Promise<ITestResult[]> {
         let results: ITestResult[] = [];
 
+        results.push(dummTestResult);
+
         // Get the test suites for this test case id
-        this._testManagementRestClient.getSuitesByTestCaseId(testcaseId).then(suites => {
-            // Then get the associated test points
-            suites.forEach(suite => {
-                this._testManagementRestClient.getPoints(
-                    suite.project.id,
-                    +suite.plan.id,
-                    suite.id,
-                    undefined,
-                    undefined,
-                    testcaseId.toString(),
-                    undefined,
-                    true,
-                    undefined,
-                    undefined
-                ).then(points => {
-                    points.forEach(point => {
-                        if (point.lastTestRun.id !== "0") {
-                            this._testManagementRestClient.getTestResultById(suite.project.id, +point.lastTestRun.id, +point.lastResult.id).then(result => {
-                                results.push(
-                                    {
-                                        projectId: suite.project.id,
-                                        plan: point.testPlan.name,
-                                        planId: point.testPlan.id,
-                                        suite: point.suite.name,
-                                        suiteId: point.suite.id,
-                                        runId: point.lastTestRun.id,
-                                        configuration: point.configuration.name,
-                                        outcome: point.outcome,
-                                        executionDate: result.startedDate
-                                    }
-                                );
-                            });
-                        } else {
-                            results.push(
-                                {
-                                    projectId: suite.project.id,
-                                    plan: point.testPlan.name,
-                                    planId: point.testPlan.id,
-                                    suite: point.suite.name,
-                                    suiteId: point.suite.id,
-                                    runId: null,
-                                    configuration: point.configuration.name,
-                                    outcome: point.outcome,
-                                    executionDate: null
-                                }
-                            );
-                        }
-                    });
-                    defer.resolve(results);
-                });
-            });
-        });
+        // let suites = await this._testManagementRestClient.getSuitesByTestCaseId(testcaseId);
+        // console.log(suites);
 
-        return defer.promise;
+        // suites.forEach(async suite => {
+        //     let points = await this._testManagementRestClient.getPoints(
+        //         suite.project.id,
+        //         +suite.plan.id,
+        //         suite.id,
+        //         undefined,
+        //         undefined,
+        //         testcaseId.toString(),
+        //         undefined,
+        //         true,
+        //         undefined,
+        //         undefined);
+
+        //     points.forEach(async point => {
+        //         if (point.lastTestRun.id !== "0") {
+        //             let result = await this._testManagementRestClient.getTestResultById(suite.project.id, +point.lastTestRun.id, +point.lastResult.id);
+        //             results.push(
+        //                 {
+        //                     projectId: suite.project.id,
+        //                     plan: point.testPlan.name,
+        //                     planId: point.testPlan.id,
+        //                     suite: point.suite.name,
+        //                     suiteId: point.suite.id,
+        //                     runId: point.lastTestRun.id,
+        //                     configuration: point.configuration.name,
+        //                     outcome: point.outcome,
+        //                     executionDate: result.startedDate
+        //                 }
+        //             );
+        //         } else {
+        //             results.push(
+        //                 {
+        //                     projectId: suite.project.id,
+        //                     plan: point.testPlan.name,
+        //                     planId: point.testPlan.id,
+        //                     suite: point.suite.name,
+        //                     suiteId: point.suite.id,
+        //                     runId: null,
+        //                     configuration: point.configuration.name,
+        //                     outcome: point.outcome,
+        //                     executionDate: null
+        //                 }
+        //             );
+        //         }
+        //     });
+        // });
+
+        return results;
     }
 
-    public navigateToTestRun(testResult: ITestResult) {
+    // public navigateToTestRun(testResult: ITestResult) {
 
-        this._testManagementRestClient.getTestRunById(testResult.projectId, Number(testResult.runId)).then((run) => {
-            this._hostNavigationService.then(s => s.navigate(run.webAccessUrl));
-        });
-    }
+    //     this._testManagementRestClient.getTestRunById(testResult.projectId, Number(testResult.runId)).then((run) => {
+    //         this._hostNavigationService.then(s => s.navigate(run.webAccessUrl));
+    //     });
+    // }
 
-    public navigateToTestSuite(testResult: ITestResult) {
+    // public navigateToTestSuite(testResult: ITestResult) {
 
-        let url: string = `${this._webContext.collection.uri}${this._webContext.project.name}/_testManagement?planId=${testResult.planId}&suiteId=${testResult.suiteId}`;
-        this._hostNavigationService.then(s => s.navigate(url));
-    }
+    //     let url: string = `${this._webContext.collection.uri}${this._webContext.project.name}/_testManagement?planId=${testResult.planId}&suiteId=${testResult.suiteId}`;
+    //     this._hostNavigationService.then(s => s.navigate(url));
+    // }
 
-    public navigateToTestPlan(testResult: ITestResult) {
+    // public navigateToTestPlan(testResult: ITestResult) {
 
-        let url: string = `${this._webContext.collection.uri}${this._webContext.project.name}/_testManagement?planId=${testResult.planId}`;
-        this._hostNavigationService.then(s => s.navigate(url));
-    }
+    //     let url: string = `${this._webContext.collection.uri}${this._webContext.project.name}/_testManagement?planId=${testResult.planId}`;
+    //     this._hostNavigationService.then(s => s.navigate(url));
+    // }
 }

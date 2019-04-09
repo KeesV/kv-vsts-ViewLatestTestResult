@@ -4,29 +4,19 @@
 <head>
     <meta charset="utf-8" />
     <title>TypeScript HTML App</title>
-    <script src="../libs/VSS.SDK.min.js"></script>
+    <script src="../libs/SDK.min.js"></script>
 
 </head>
 <body>
     <script type="text/javascript">
         // Initialize the VSS sdk
-        VSS.init({
-            setupModuleLoader: true,
-            explicitNotifyLoaded: true,
-            usePlatformScripts: true,
-            usePlatformStyles: true,
-            moduleLoaderConfig: {
-                paths: {
-                    "Scripts": "scripts"
-                }
-            }
-        });
+        SDK.init();
 
         //// Wait for the SDK to be initialized
-        VSS.ready(function () {
+        SDK.ready(function () {
             require(["src/app"], function (app) {
-                VSS.register(VSS.getContribution().id, app.register);
-                VSS.notifyLoadSucceeded();
+                SDK.register(SDK.getContribution().id, app.register);
+                SDK.notifyLoadSucceeded();
             });
         });
 

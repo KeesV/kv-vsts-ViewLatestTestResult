@@ -1,7 +1,6 @@
-﻿/// <reference types="vss-web-extension-sdk" />
-
-import * as React from "react";
+﻿import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as SDK from "azure-devops-extension-sdk";
 
 import { TestResults } from "./containers/testResults";
 
@@ -30,3 +29,4 @@ export function register() {
         }
     };
 }
+

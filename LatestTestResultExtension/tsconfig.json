@@ -6,7 +6,8 @@
         "moduleResolution": "node",
         "jsx": "react",
         "types": [],
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "lib": [ "es2015", "dom" ]
     },
     "exclude": [
         "node_modules"
