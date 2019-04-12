@@ -1,11 +1,11 @@
 export interface ITestResult {
     projectId: string,
     plan: string;
-    planId: string,
+    planId: number,
     suite: string;
-    suiteId: string,
-    runId: string,
+    suiteId: number,
+    runId: number,
     configuration: string;
-    outcome: string;
-    executionDate: Date;
+    outcome: number;
+    executionDate: Date | undefined;
 }

@@ -5,12 +5,12 @@ export interface IHeaderProps {
 }
 
 export class Header extends React.Component<IHeaderProps, null> {
-    constructor(props?: IHeaderProps) {
+    constructor(props: IHeaderProps) {
         super(props);
     }
 
     public render(): JSX.Element {
-        let rightHeader: JSX.Element = null;
+        let rightHeader: JSX.Element;
         return (
             <div className="tfs-collapsible-header wit-form-group-header disabled">
                 <span className="tfs-collapsible-text" role="button">
