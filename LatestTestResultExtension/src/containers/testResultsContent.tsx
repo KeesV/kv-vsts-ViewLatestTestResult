@@ -1,8 +1,7 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
 
 import { Card } from "azure-devops-ui/Card";
-import { Table, ISimpleTableCell, renderSimpleCell, ITableColumn, ColumnSorting, SortOrder, sortItems, ColumnFill } from "azure-devops-ui/Table";
+import { Table, ISimpleTableCell, renderSimpleCell, ITableColumn, ColumnSorting, SortOrder, sortItems, ColumnFill, ColumnMore, SimpleTableCell } from "azure-devops-ui/Table";
 
 import CustomError from "../components/error";
 import TestOutcomeIcon from "../components/testOutcomeIcon"
@@ -12,6 +11,7 @@ import { ITestResult } from "../models/itestresult";
 import { VSTSService } from "../services/vstsService";
 import { ObservableValue, ObservableArray } from "azure-devops-ui/Core/Observable";
 import { Outcome } from "azure-devops-extension-api/TestPlan/TestPlan";
+import { IMenuProps } from "azure-devops-ui/Menu";
 
 interface ITableItem extends ISimpleTableCell {
     projectId: string;
@@ -24,60 +24,6 @@ interface ITableItem extends ISimpleTableCell {
     outcome: Outcome;
     executionDate: string;
 }
-
-const fixedColumns: ITableColumn<ITableItem>[] = [
-    {
-        id: "outcome",
-        name: "Outcome",
-        renderCell: (rowIndex: number, columnIndex: number, tableColumn: ITableColumn<ITableItem>, tableItem: ITableItem) => <td className="bolt-table-cell bolt-list-cell" key="tablerow_{rowIndex}"><TestOutcomeIcon outcome={tableItem.outcome} /></td>,
-        width: new ObservableValue(150),
-        sortProps: {
-            ariaLabelAscending: "Sorted A to Z",
-            ariaLabelDescending: "Sorted Z to A"
-        },
-    },
-    {
-        id: "plan",
-        name: "Plan",
-        renderCell: renderSimpleCell,
-        width: new ObservableValue(200),
-        sortProps: {
-            ariaLabelAscending: "Sorted A to Z",
-            ariaLabelDescending: "Sorted Z to A"
-        },
-    },
-    {
-        id: "suite",
-        name: "Suite",
-        renderCell: renderSimpleCell,
-        width: new ObservableValue(200),
-        sortProps: {
-            ariaLabelAscending: "Sorted A to Z",
-            ariaLabelDescending: "Sorted Z to A"
-        },
-    },
-    {
-        id: "configuration",
-        name: "Configuration",
-        renderCell: renderSimpleCell,
-        width: new ObservableValue(200),
-        sortProps: {
-            ariaLabelAscending: "Sorted A to Z",
-            ariaLabelDescending: "Sorted Z to A"
-        },
-    },
-    {
-        id: "executionDate",
-        name: "Execution Date",
-        renderCell: renderSimpleCell,
-        width: new ObservableValue(250),
-        sortProps: {
-            ariaLabelAscending: "Sorted Oldest to Latest",
-            ariaLabelDescending: "Sorted Latest to Oldest"
-        },
-
-    }
-];
 
 export interface ITestResultsContentProps {
     testCaseId: number;
@@ -98,6 +44,97 @@ export class TestResultsContent extends React.Component<ITestResultsContentProps
         this.state = this._getInitialState();
     }
 
+    private fixedColumns: ITableColumn<ITableItem>[] = [
+        {
+            id: "outcome",
+            name: "Outcome",
+            renderCell: this.renderTestOutcomeIcon,
+            width: new ObservableValue(150),
+            sortProps: {
+                ariaLabelAscending: "Sorted A to Z",
+                ariaLabelDescending: "Sorted Z to A"
+            },
+        },
+        {
+            id: "plan",
+            name: "Plan",
+            renderCell: renderSimpleCell,
+            width: new ObservableValue(200),
+            sortProps: {
+                ariaLabelAscending: "Sorted A to Z",
+                ariaLabelDescending: "Sorted Z to A"
+            },
+        },
+        {
+            id: "suite",
+            name: "Suite",
+            renderCell: renderSimpleCell,
+            width: new ObservableValue(200),
+            sortProps: {
+                ariaLabelAscending: "Sorted A to Z",
+                ariaLabelDescending: "Sorted Z to A"
+            },
+        },
+        {
+            id: "configuration",
+            name: "Configuration",
+            renderCell: renderSimpleCell,
+            width: new ObservableValue(200),
+            sortProps: {
+                ariaLabelAscending: "Sorted A to Z",
+                ariaLabelDescending: "Sorted Z to A"
+            },
+        },
+        {
+            id: "executionDate",
+            name: "Execution Date",
+            renderCell: renderSimpleCell,
+            width: new ObservableValue(250),
+            sortProps: {
+                ariaLabelAscending: "Sorted Oldest to Latest",
+                ariaLabelDescending: "Sorted Latest to Oldest"
+            },
+    
+        },
+        new ColumnMore(item => this.menuProvider(item))
+    ];
+
+    private menuProvider(item: ITableItem): IMenuProps
+    {
+        let menuItems = [
+            { id: "open-test-plan", text: "Open Test Plan", data: item, onActivate: (item: any) => { this.service.navigateToTestPlan(item.data.planId); } },
+            { id: "open-test-suite", text: "Open Test Suite", data: item, onActivate: (item: any) => { this.service.navigateToTestSuite(item.data.planId, item.data.suiteId); } }
+        ];
+        
+        if(item.runId.length > 0)
+        {
+            menuItems.push(
+                { id: "open-test-run", text: "Open Test Run", data: item, onActivate: (item: any) => { this.service.navigateToTestRun(item.data.projectId, item.data.runId); } }
+            );
+        }
+
+        return ({
+            id: "sub-menu",
+            items: menuItems
+        });
+    }
+
+    private renderTestOutcomeIcon(
+        _rowIndex: number,
+        columnIndex: number,
+        tableColumn: ITableColumn<ITableItem>,
+        item: ITableItem
+    ): JSX.Element {
+        return (
+            <SimpleTableCell
+                columnIndex={columnIndex}
+                tableColumn={tableColumn}
+                key={"col-" + columnIndex} >
+                <TestOutcomeIcon outcome={item.outcome} />
+            </SimpleTableCell>
+        )
+    }
+    
     // Create the sorting behavior (delegate that is called when a column is sorted).
     private sortingBehavior = new ColumnSorting<ITableItem>(
         (
@@ -112,7 +149,7 @@ export class TestResultsContent extends React.Component<ITestResultsContentProps
                     columnIndex,
                     proposedSortOrder,
                     this.sortFunctions,
-                    fixedColumns,
+                    this.fixedColumns,
                     this.state.itemProvider.value
                 )
             );
@@ -138,7 +175,6 @@ export class TestResultsContent extends React.Component<ITestResultsContentProps
         },
         // Sort on Age column
         (item1: ITableItem, item2: ITableItem): number => {
-            console.log("Sorting!");
             let date1 = item1.executionDate !== "" ? new Date(item1.executionDate) : new Date(1970, 1, 1, 0, 0, 0, 0);
             let date2 = item2.executionDate !== "" ? new Date(item2.executionDate) : new Date(1970, 1, 1, 0, 0, 0, 0);
 
@@ -181,8 +217,6 @@ export class TestResultsContent extends React.Component<ITestResultsContentProps
 
         if (isTestCase) {
             let testResults = await this.service.GetTestResultsForTestCase(this.props.testCaseId);
-            console.log("Test results:");
-            console.log(testResults);
             testResults.forEach(r => this.state.itemProvider.push(this.convertTestresultToTableItem(r)));
             this.setState({ errorText: "", isLoading: false });
         } else {
@@ -201,7 +235,7 @@ export class TestResultsContent extends React.Component<ITestResultsContentProps
                     className="flex-grow bolt-card-no-vertical-padding"
                     contentProps={{ contentPadding: false }}
                 >
-                    <Table<ITableItem> behaviors={[this.sortingBehavior]} columns={fixedColumns} itemProvider={this.state.itemProvider} />
+                    <Table<ITableItem> behaviors={[this.sortingBehavior]} columns={this.fixedColumns} itemProvider={this.state.itemProvider} />
                 </Card>;
             } else {
                 content = <CustomError text={this.state.errorText } />;
@@ -225,7 +259,7 @@ export class TestResultsContent extends React.Component<ITestResultsContentProps
     private convertTestresultToTableItem(testResult: ITestResult): ITableItem {
         console.log(testResult);
         return {
-            projectId: testResult.planId.toString(),
+            projectId: testResult.projectId,
             plan: testResult.plan,
             planId: testResult.planId.toString(),
             suite: testResult.suite,

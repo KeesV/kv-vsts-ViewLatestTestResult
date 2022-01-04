@@ -21,6 +21,7 @@ function register() {
         },
         onLoaded: function(args: any) {
             console.log("onLoaded");
+            console.log(args);
             init("latesttestresults", args.id);
         },
         onUnloaded: function(args: any) {

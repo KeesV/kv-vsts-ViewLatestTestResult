@@ -1,10 +1,9 @@
 import * as SDK from "azure-devops-extension-sdk";
-import { CommonServiceIds, getClient, IProjectPageService } from "azure-devops-extension-api";
-
-import { IWorkItemFormService, WorkItemTrackingServiceIds } from "azure-devops-extension-api/WorkItemTracking/WorkItemTrackingServices";
+import { CommonServiceIds, getClient, IProjectPageService, IHostNavigationService, ILocationService } from "azure-devops-extension-api";
 
 import { ITestResult } from "../models/itestresult";
 import { TestPlanRestClient } from "azure-devops-extension-api/TestPlan/TestPlanClient";
+import { TestRestClient } from 'azure-devops-extension-api/Test'
 import { WorkItemTrackingRestClient } from "azure-devops-extension-api/WorkItemTracking"
 import { TestSuite } from "azure-devops-extension-api/Test/Test";
 
@@ -23,10 +22,12 @@ const dummTestResult: ITestResult = {
 export class VSTSService {
     private _workItemTrackingRestClient: WorkItemTrackingRestClient;
     private _testPlanRestClient: TestPlanRestClient;
+    private _testRestClient: TestRestClient;
 
     constructor() {
         this._workItemTrackingRestClient = getClient(WorkItemTrackingRestClient);
         this._testPlanRestClient = getClient(TestPlanRestClient);
+        this._testRestClient = getClient(TestRestClient);
     }
 
     public async IsTestCase(workItemId: number): Promise<boolean> {    
@@ -37,12 +38,8 @@ export class VSTSService {
     public async GetTestResultsForTestCase(testCaseId: number): Promise<ITestResult[]> {
         let results: ITestResult[] = [];
 
-        //results.push(dummTestResult);
-
         // Get the test suites for this test case id
         let suites = await this._testPlanRestClient.getSuitesByTestCaseId(testCaseId);
-        console.log("Suites:")
-        console.log(suites);
 
         for (const suite of suites) {
             // TODO: respect continuationtoken
@@ -54,12 +51,8 @@ export class VSTSService {
                 testCaseId.toString(),
                 undefined);
 
-            console.log("Points:")
-            console.log(points);
-
             for (const point of points)
             {
-                //let result = await this._testPlanRestClient.gettes.getTestResultById(suite.project.id, +point.lastTestRun.id, +point.lastResult.id);
                 results.push(
                     {
                         projectId: suite.project.id,
@@ -70,8 +63,7 @@ export class VSTSService {
                         runId: point.results.lastTestRunId,
                         configuration: point.configuration.name,
                         outcome: point.results.outcome,
-                        executionDate: point.results.lastResultDetails ? point.results.lastResultDetails.dateCompleted : undefined,
-                        
+                        executionDate: point.results.lastResultDetails ? point.results.lastResultDetails.dateCompleted : undefined                        
                     }
                 );
             }
@@ -80,22 +72,38 @@ export class VSTSService {
         return results;
     }
 
-    // public navigateToTestRun(testResult: ITestResult) {
+    public async navigateToTestRun(projectId: string, runId: number): Promise<void> {
+        let run = await this._testRestClient.getTestRunById(projectId, runId);
+        
+        let navService = await SDK.getService<IHostNavigationService>("ms.vss-features.host-navigation-service");
+        navService.navigate(run.webAccessUrl);
+    }
 
-    //     this._testManagementRestClient.getTestRunById(testResult.projectId, Number(testResult.runId)).then((run) => {
-    //         this._hostNavigationService.then(s => s.navigate(run.webAccessUrl));
-    //     });
-    // }
+    public async navigateToTestSuite(testPlanId: number, testSuiteId: number): Promise<void> {
+        let locationservice = await SDK.getService<ILocationService>("ms.vss-features.location-service");
+        const serviceLocation = await locationservice.getServiceLocation();
+       
+        let projectService = await SDK.getService<IProjectPageService>("ms.vss-tfs-web.tfs-page-data-service");
+        const project = await projectService.getProject();
 
-    // public navigateToTestSuite(testResult: ITestResult) {
+        let navService = await SDK.getService<IHostNavigationService>("ms.vss-features.host-navigation-service");
 
-    //     let url: string = `${this._webContext.collection.uri}${this._webContext.project.name}/_testManagement?planId=${testResult.planId}&suiteId=${testResult.suiteId}`;
-    //     this._hostNavigationService.then(s => s.navigate(url));
-    // }
+        let url = `${serviceLocation}${project!.name}/_testManagement?planId=${testPlanId}&suiteId=${testSuiteId}`
 
-    // public navigateToTestPlan(testResult: ITestResult) {
+        navService.navigate(url);
+    }
 
-    //     let url: string = `${this._webContext.collection.uri}${this._webContext.project.name}/_testManagement?planId=${testResult.planId}`;
-    //     this._hostNavigationService.then(s => s.navigate(url));
-    // }
+    public async navigateToTestPlan(testPlanId: number): Promise<void> {
+        let locationservice = await SDK.getService<ILocationService>("ms.vss-features.location-service");
+        const serviceLocation = await locationservice.getServiceLocation();
+       
+        let projectService = await SDK.getService<IProjectPageService>("ms.vss-tfs-web.tfs-page-data-service");
+        const project = await projectService.getProject();
+
+        let navService = await SDK.getService<IHostNavigationService>("ms.vss-features.host-navigation-service");
+
+        let url = `${serviceLocation}${project!.name}/_testManagement?planId=${testPlanId}`
+
+        navService.navigate(url);
+    }
 }
